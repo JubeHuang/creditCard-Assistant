@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>信用卡回饋助理</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Funnel+Sans:wght@400;500;600&family=Geist:wght@400;500;700&family=Geist+Mono:wght@400;500&family=Inter:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap');
+
+  :root {
+    --bg: #ffffff;
+    --surface: #f7f8fa;
+    --surface-2: #ffffff;
+    --border: #e8ebef;
+    --border-strong: #d7dde4;
+    --text: #1a1a1a;
+    --text2: #666666;
+    --text3: #888888;
+    --accent: #4a9fd8;
+    --green: #248a58;
+    --red: #e06060;
+    --radius: 16px;
+    --radius-sm: 12px;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+    overflow-x: hidden;
+  }
+
+  .container {
+    position: relative;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* Header */
+  header {
+    margin-bottom: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 24px;
+  }
+
+  .header-label {
+    font-family: 'Funnel Sans', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--text3);
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    font-family: 'Geist', sans-serif;
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--text2);
+    font-weight: 400;
+  }
+
+  /* Input panel */
+  .input-panel {
+    background:
+      radial-gradient(circle at 85% 8%, rgba(74,159,216,0.15) 0%, rgba(255,255,255,0) 42%),
+      linear-gradient(180deg, #ffffff 0%, #eef2f5 100%);
+    border: 1px solid #d5dce3;
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .input-panel:focus-within {
+    border-color: #b7c7d5;
+  }
+
+  .panel-title {
+    font-family: 'Geist', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    color: var(--text);
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  .input-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .input-row.triple {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .input-row.single {
+    grid-template-columns: 1fr;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  label {
+    font-family: 'Funnel Sans', sans-serif;
+    font-size: 11px;
+    color: var(--text2);
+    font-weight: 500;
+    letter-spacing: 0.03em;
+  }
+
+  input, select, textarea {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    padding: 10px 12px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    outline: none;
+    width: 100%;
+  }
+
+  input:focus, select:focus {
+    border-color: #9fb9ce;
+    box-shadow: 0 0 0 3px rgba(74, 159, 216, 0.12);
+  }
+
+  select option {
+    background: #ffffff;
+  }
+
+  /* FX row */
+  .fx-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 12px;
+    color: var(--text2);
+  }
+
+  .fx-input {
+    width: 120px !important;
+    flex-shrink: 0;
+  }
+
+  /* Toggles */
+  .toggle-group {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .toggle {
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-family: 'Funnel Sans', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: #ffffff;
+    color: var(--text2);
+    white-space: nowrap;
+  }
+
+  .toggle.active {
+    background: #edf4fb;
+    border-color: #cfe0ee;
+    color: #357fb0;
+  }
+
+  .toggle:hover:not(.active) {
+    border-color: var(--border-strong);
+    color: var(--text);
+  }
+
+  /* Merchant input */
+  .merchant-input-wrap {
+    position: relative;
+  }
+
+  .autocomplete-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    z-index: 100;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 4px;
+    display: none;
+  }
+
+  .autocomplete-list.visible { display: block; }
+
+  .autocomplete-item {
+    padding: 10px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.1s;
+  }
+
+  .autocomplete-item:last-child { border-bottom: none; }
+  .autocomplete-item:hover { background: #f3f7fb; }
+
+  .autocomplete-tag {
+    font-size: 10px;
+    font-family: 'Geist Mono', monospace;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(74,159,216,0.14);
+    color: var(--accent);
+  }
+
+  /* Calculate button */
+  .calc-btn {
+    width: 100%;
+    padding: 14px;
+    background: #4A9FD8;
+    color: #ffffff;
+    border: 1px solid #6CB1E1;
+    border-radius: var(--radius-sm);
+    font-family: 'Geist', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.15s;
+    margin-top: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+
+  .calc-btn:hover {
+    filter: brightness(1.04);
+    transform: translateY(-1px);
+  }
+
+  .calc-btn:active {
+    transform: translateY(0);
+  }
+
+  /* Results section */
+  #results { margin-top: 24px; }
+
+  .results-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .results-title {
+    font-family: 'Funnel Sans', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--text3);
+  }
+
+  .context-summary {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    color: var(--text);
+  }
+
+  /* Card result */
+  .card-result {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 20px;
+    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+    animation: slideIn 0.3s ease both;
+  }
+
+  .card-result:hover {
+    border-color: var(--border-strong);
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-result:nth-child(1) { animation-delay: 0.0s; }
+  .card-result:nth-child(2) { animation-delay: 0.07s; }
+  .card-result:nth-child(3) { animation-delay: 0.14s; }
+
+  /* Rank badge */
+  .rank-badge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    border-radius: var(--radius) 0 0 var(--radius);
+  }
+
+  .rank-1 .rank-badge { background: #357fb0; }
+  .rank-2 .rank-badge { background: #5f86a0; }
+  .rank-3 .rank-badge { background: #6b7e8b; }
+
+  .card-result-inner { padding-left: 12px; }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+
+  .card-info {}
+
+  .rank-label {
+    font-family: 'Funnel Sans', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+
+  .rank-1 .rank-label { color: #357fb0; }
+  .rank-2 .rank-label { color: #5f86a0; }
+  .rank-3 .rank-label { color: #6b7e8b; }
+
+  .card-name {
+    font-family: 'Geist', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+
+  .card-bank {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: var(--text3);
+  }
+
+  .reward-amount {
+    text-align: right;
+  }
+
+  .reward-value {
+    font-family: 'Geist Mono', monospace;
+    font-size: 26px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .rank-1 .reward-value { color: #357fb0; }
+  .rank-2 .reward-value { color: #5f86a0; }
+  .rank-3 .reward-value { color: #6b7e8b; }
+
+  .reward-label {
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 2px;
+  }
+
+  /* Rate breakdown */
+  .rate-breakdown {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+
+  .rate-pill {
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: #f1f4f8;
+    border: 1px solid var(--border);
+    color: var(--text2);
+  }
+
+  .rate-pill.main { background: #edf4fb; border-color: #cfe0ee; color: #357fb0; }
+  .rate-pill.plus { background: #edf9f2; border-color: #c9e8d8; color: #248a58; }
+  .rate-pill.total { background: #e9f2fa; border-color: #b7d0e3; color: #2f6f99; font-weight: 500; }
+
+  /* Notes */
+  .card-notes {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .note {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.5;
+  }
+
+  .note-icon {
+    flex-shrink: 0;
+    font-size: 10px;
+    margin-top: 2px;
+  }
+
+  .note.warning { color: #e0a84a; }
+  .note.action { color: #248a58; }
+  .note.info { color: var(--text2); }
+
+  /* Best recommendation */
+  .best-rec {
+    background: #eef5fc;
+    border: 1px solid #cfe0ee;
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.6;
+    animation: slideIn 0.4s ease 0.3s both;
+  }
+
+  .best-rec strong {
+    color: #357fb0;
+  }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 60px 24px;
+    color: var(--text3);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .empty-icon {
+    font-size: 40px;
+    margin-bottom: 12px;
+    opacity: 0.4;
+  }
+
+  .empty-text {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  /* Error */
+  .error-box {
+    background: rgba(224,96,96,0.08);
+    border: 1px solid rgba(224,96,96,0.2);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--red);
+  }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: var(--border-strong);
+    margin: 10px 0;
+  }
+
+  /* Responsive */
+  @media (max-width: 500px) {
+    .input-row { grid-template-columns: 1fr; }
+    .input-row.triple { grid-template-columns: 1fr 1fr; }
+    h1 { font-size: 22px; }
+    header, .input-panel, #results { padding-left: 16px; padding-right: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="header-label">信用卡回饋計算機 v1.0</div>
+    <h1>刷哪張最划算？</h1>
+    <p class="subtitle">根據你的消費情境，精確計算持有卡片的回饋排名</p>
+  </header>
+
+  <!-- Input Panel -->
+  <div class="input-panel">
+    <div class="panel-title">消費情境</div>
+
+    <div class="input-row">
+      <div class="field">
+        <label>消費金額</label>
+        <input type="number" id="amount" placeholder="例：3820" min="1" step="1">
+      </div>
+      <div class="field">
+        <label>消費幣別</label>
+        <select id="currency">
+          <option value="TWD">TWD 台幣</option>
+          <option value="JPY">JPY 日圓</option>
+          <option value="USD">USD 美元</option>
+          <option value="EUR">EUR 歐元</option>
+          <option value="KRW">KRW 韓圓</option>
+          <option value="GBP">GBP 英鎊</option>
+          <option value="OTHER">其他外幣</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- FX rate row (hidden when TWD) -->
+    <div class="fx-row" id="fx-row" style="display:none">
+      <span>匯率：1</span>
+      <span id="fx-currency-label">JPY</span>
+      <span>=</span>
+      <input type="number" id="fx-rate" class="fx-input" placeholder="0.22" step="0.001" min="0.001">
+      <span>TWD（請輸入即時匯率）</span>
+    </div>
+
+    <div class="input-row">
+      <div class="field">
+        <label>商家 / 消費平台</label>
+        <div class="merchant-input-wrap">
+          <input type="text" id="merchant" placeholder="例：momo、7-11、Netflix…" autocomplete="off">
+          <div class="autocomplete-list" id="autocomplete-list"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label>消費地點</label>
+        <select id="country">
+          <option value="TW">台灣</option>
+          <option value="JP">日本</option>
+          <option value="KR">韓國</option>
+          <option value="US">美國</option>
+          <option value="EU">歐洲</option>
+          <option value="TH">泰國</option>
+          <option value="SG">新加坡</option>
+          <option value="OTHER">其他海外</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="input-row">
+      <div class="field">
+        <label>消費通路</label>
+        <div class="toggle-group" id="channel-group">
+          <button class="toggle active" data-val="online" onclick="setToggle('channel-group', this)">線上</button>
+          <button class="toggle" data-val="offline" onclick="setToggle('channel-group', this)">實體</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>是否假日／國定假日</label>
+        <div class="toggle-group" id="weekend-group">
+          <button class="toggle active" data-val="weekday" onclick="setToggle('weekend-group', this)">平日</button>
+          <button class="toggle" data-val="weekend" onclick="setToggle('weekend-group', this)">假日</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="field" style="margin-bottom:14px">
+      <label>支付方式（可複選；不選則自動推薦最佳）</label>
+      <div class="toggle-group" id="payment-group">
+        <button class="toggle" data-val="line_pay" onclick="toggleMulti(this)">LINE Pay</button>
+        <button class="toggle" data-val="apple_pay" onclick="toggleMulti(this)">Apple Pay</button>
+        <button class="toggle" data-val="physical_card" onclick="toggleMulti(this)">實體卡</button>
+        <button class="toggle" data-val="taishin_pay" onclick="toggleMulti(this)">台新Pay</button>
+        
+        
+      </div>
+    </div>
+
+    <button class="calc-btn" onclick="calculate()">計算最佳回饋 →</button>
+  </div>
+
+  <!-- Results -->
+  <div id="results">
+    <div class="empty-state">
+      <div class="empty-icon">💳</div>
+      <div class="empty-text">輸入消費情境後點擊計算<br>即可看到持有卡片的回饋排名</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+// CARD DATA
+// ============================================================
+const CARDS = [{"card_id":"sinopac_bibei_usd","bank":"永豐銀行","card_name":"幣倍卡（美元）","card_network":"Mastercard","billing_currency":"USD","foreign_transaction_fee":null,"reward_currency":"cashback","assumptions":{"user_level":"level2","level2_prerequisites_always_met":true},"merchant_groups":{"bibei_selected":["SUICA","PASMO","ICOCA","Amazon","Rakuten","Mercari","iHerb","淘寶","Agoda","Booking.com","Klook","KKDAY","大國藥妝","Sugi藥妝","Selfridge","eBay","Gmarket","Olive Young","航空公司","旅行社","Hotels","Expedia","Trip.com","Airbnb","Trivago","AsiaYo","歐特儀松山機場停車"]},"reward_rules":[{"rule_id":"bibei_domestic_base_1pct","scope":{"country":"TW"},"rate":0.01,"cap":null,"stackable":true,"priority":1,"description":"國內一般消費 1%（無上限；可與任務/精選加碼疊加）"},{"rule_id":"bibei_domestic_task_bonus_1pct_cap200","scope":{"country":"TW"},"rate":0.01,"cap":{"period":"calendar_month","max_reward_twd":200,"cap_applies_to":"this_rule_only"},"requires":{"task_completed":true},"stackable":true,"priority":2,"description":"任務加碼 +1%（每月上限 200；與基本 1% 疊加）"},{"rule_id":"bibei_foreign_base_2pct","scope":{"foreign":true},"rate":0.02,"cap":null,"stackable":true,"priority":1,"description":"海外一般消費 2%（無上限；可與任務/精選加碼疊加）"},{"rule_id":"bibei_foreign_task_bonus_1pct","scope":{"foreign":true},"rate":0.01,"cap":null,"requires":{"task_completed":true},"stackable":true,"priority":2,"description":"海外任務加碼 +1%（無上限；與海外基本 2% 疊加）"},{"rule_id":"bibei_selected_bonus_4pct_cap300","scope":{"merchant_group":"bibei_selected"},"rate":0.04,"cap":{"period":"calendar_month","max_reward_twd":300,"cap_applies_to":"this_rule_only"},"stackable":true,"priority":3,"description":"精選商家加碼 +4%（每月上限 300；可與基本/任務疊加）"}],"payment_dictionary":{"supported_default":["physical_card"]},"merchant_payment_restrictions":{"7-11":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行"],"taishin_pay":["台新銀行"]},"7-eleven":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行"],"taishin_pay":["台新銀行"]},"全家":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"taishin_pay":["台新銀行"]},"全家便利商店":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"taishin_pay":["台新銀行"]}}},{"card_id":"sinopac_sport","bank":"永豐銀行","card_name":"SPORT 卡","card_network":"Mastercard","billing_currency":"TWD","foreign_transaction_fee":null,"reward_currency":"points","assumptions":{"sport_task_always_met":true},"reward_rules":[{"rule_id":"sport_base_1pct","scope":{},"rate":0.01,"stackable":true,"priority":1,"description":"一般消費 1%（無上限）"},{"rule_id":"sport_mobile_pay_4pct_cap300","scope":{"payment_method_in":["apple_pay"]},"rate":0.04,"cap":{"period":"calendar_month","max_reward_twd":300},"stackable":true,"priority":2,"description":"Apple Pay 加碼 +4%（與基本 1% 疊加，最高 5%；每月上限 300）"}],"payment_dictionary":{"supported_default":["physical_card","apple_pay"]},"merchant_payment_restrictions":{"7-11":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行"],"taishin_pay":["台新銀行"]},"7-eleven":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行"],"taishin_pay":["台新銀行"]},"全家":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"taishin_pay":["台新銀行"]},"全家便利商店":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"taishin_pay":["台新銀行"]}}},{"card_id":"sinopac_dawho","bank":"永豐銀行","card_name":"DAWHO 現金回饋卡","card_network":"Mastercard","billing_currency":"TWD","foreign_transaction_fee":null,"reward_currency":"cashback","assumptions":{"dawho_level":"premium"},"merchant_groups":{"easycard_auto_topup":["悠遊卡自動加值"]},"reward_rules":[{"rule_id":"dawho_domestic_1pct","scope":{"country":"TW"},"rate":0.01,"stackable":true,"priority":1,"description":"國內一般消費 1%（無上限；可與任務加碼疊加）"},{"rule_id":"dawho_foreign_2pct","scope":{"foreign":true},"rate":0.02,"stackable":true,"priority":1,"description":"海外一般消費 2%（無上限；可與任務加碼疊加）"},{"rule_id":"dawho_task_2_5pct_cap400","scope":{},"rate":0.025,"cap":{"period":"calendar_month","max_reward_twd":400,"cap_applies_to":"this_rule_only"},"stackable":true,"priority":2,"description":"任務加碼 +2.5%（國內合計 3.5%、海外合計 4.5%；每月加碼上限 400）"},{"rule_id":"dawho_easycard_3pct_cap100","scope":{"merchant_group":"easycard_auto_topup"},"rate":0.03,"cap":{"period":"calendar_month","max_reward_twd":100},"stackable":false,"priority":10,"description":"悠遊卡自動加值 3%（每月上限 100；通常不與一般回饋疊加）"}],"payment_dictionary":{"supported_default":["physical_card"]},"merchant_payment_restrictions":{"7-11":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行"],"taishin_pay":["台新銀行"]},"7-eleven":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行"],"taishin_pay":["台新銀行"]},"全家":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"taishin_pay":["台新銀行"]},"全家便利商店":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"taishin_pay":["台新銀行"]}}},{"card_id":"esun_ubear","bank":"玉山銀行","card_name":"U Bear 卡","card_network":"Mastercard","billing_currency":"TWD","foreign_transaction_fee":null,"reward_currency":"cashback","assumptions":{"e_statement_enabled":true,"pxpay_treated_as_online":true},"merchant_groups":{"ubear_online":["全支付","街口支付","LINE Pay","momo","蝦皮"],"ubear_streaming":["Netflix","Disney+","Nintendo","PlayStation"]},"reward_rules":[{"rule_id":"ubear_base_1pct","scope":{},"rate":0.01},{"rule_id":"ubear_online_2pct_cap150","scope":{"merchant_group":"ubear_online"},"rate":0.02,"cap":{"period":"statement_cycle","max_reward_twd":150}},{"rule_id":"ubear_streaming_10pct_cap100","scope":{"merchant_group":"ubear_streaming"},"rate":0.1,"cap":{"period":"statement_cycle","max_reward_twd":100}}],"payment_dictionary":{"supported_default":["physical_card"]},"merchant_payment_restrictions":{"7-11":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行"],"taishin_pay":["台新銀行"]},"7-eleven":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行"],"taishin_pay":["台新銀行"]},"全家":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"taishin_pay":["台新銀行"]},"全家便利商店":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"taishin_pay":["台新銀行"]}}},{"card_id":"esun_kumamon_jpy","bank":"玉山銀行","card_name":"熊本熊卡（日圓雙幣）","card_network":"JCB","billing_currency":"JPY","foreign_transaction_fee":0.015,"reward_currency":"cashback","merchant_groups":{"kumamon_japan_specified":["SUICA","PASMO","ICOCA","BicCamera","松本清","唐吉訶德","UNIQLO","GU"]},"reward_rules":[{"rule_id":"kumamon_japan_2_5pct","scope":{"country":"JP"},"rate":0.025},{"rule_id":"kumamon_japan_specified_6pct_cap500","scope":{"merchant_group":"kumamon_japan_specified"},"rate":0.06,"cap":{"period":"statement_cycle","max_reward_twd":500}}],"payment_dictionary":{"supported_default":["physical_card"]},"merchant_payment_restrictions":{"7-11":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行"],"taishin_pay":["台新銀行"]},"7-eleven":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行"],"taishin_pay":["台新銀行"]},"全家":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"taishin_pay":["台新銀行"]},"全家便利商店":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"taishin_pay":["台新銀行"]}}},{"card_id":"dbs_eco","bank":"星展銀行","card_name":"ECO 永續卡","card_network":"Mastercard","billing_currency":"TWD","foreign_transaction_fee":null,"reward_currency":"cashback","assumptions":{"task_completed":false},"merchant_groups":{"dbs_eco_merchants":["Tesla 充電資費","Gogoro 電池資費","鮮乳坊","茶籽堂","禾乃川","直接跟農夫買","綠藤生機","艾瑪絲"]},"reward_rules":[{"rule_id":"eco_base_1pct","scope":{},"rate":0.01},{"rule_id":"eco_overseas_offline_5pct_cap600","scope":{"foreign":true,"channel":["offline"],"country_in":["JP","KR","TH","SG","EU","US"]},"rate":0.05,"cap":{"period":"statement_cycle","max_reward_twd":600}},{"rule_id":"eco_merchant_10pct_cap300","scope":{"merchant_group":"dbs_eco_merchants"},"rate":0.1,"cap":{"period":"statement_cycle","max_reward_twd":300}}],"payment_dictionary":{"supported_default":["physical_card"]},"merchant_payment_restrictions":{"7-11":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行"],"taishin_pay":["台新銀行"]},"7-eleven":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行"],"taishin_pay":["台新銀行"]},"全家":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"taishin_pay":["台新銀行"]},"全家便利商店":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"taishin_pay":["台新銀行"]}}},{"card_id":"dbs_aov","bank":"星展銀行","card_name":"傳說對決聯名卡","card_network":"Mastercard","billing_currency":"TWD","foreign_transaction_fee":null,"reward_currency":"points","assumptions":{"exclude_new_user_rules":true,"has_dbs_digital_account":true,"autopay_enabled":true,"do_not_track_cap_usage":true},"merchant_groups":{"dbs_aov_lifestyle_selected":["App Store","Google Play","Garena","GASH","MyCard","Nintendo","PlayStation","Steam","Acer","ASUS","Logitech","NOVA","三創生活園區","寬宏售票","KKTIX","年代售票","拓元售票","YouTube Premium","Apple TV","Netflix","Disney+","Spotify","Twitch","愛奇藝","Catchplay","KKBOX","KKTV","LINE TV","LiTV","愛爾達電視","Uber Eats","foodpanda","麥當勞","肯德基","摩斯漢堡","21 世紀風味館","美墨炸雞","拿坡里","Pizza Hut","蝦皮"]},"excluded_categories":["bill_payment_platform","utilities","tuition","medical","parking","insurance","investment_platform","gambling","topup_or_prepaid","electronic_ticket_auto_topup","pxmart_and_pxpay","tax_and_government_fee","bank_related_fees"],"reward_rules":[{"rule_id":"aov_domestic_base_1_2pct_autopay","scope":{"country":"TW","exclude_categories":"excluded_categories"},"rate":0.012,"cap":null,"stackable":true,"priority":1,"description":"國內一般消費 1.2%（Autopay）"},{"rule_id":"aov_foreign_base_2_5pct_autopay","scope":{"foreign":true,"exclude_categories":"excluded_categories"},"rate":0.025,"cap":null,"stackable":true,"priority":1,"description":"海外一般消費 2.5%（Autopay）"},{"rule_id":"aov_lifestyle_selected_bonus_8_8pct_domestic_cap1000","scope":{"country":"TW","merchant_group":"dbs_aov_lifestyle_selected","exclude_categories":"excluded_categories"},"rate":0.088,"cap":{"period":"calendar_month","max_reward_twd":1000},"stackable":true,"priority":2,"description":"生活玩家精選 +8.8%（上限 1,000）","exclusive_group":"aov_domestic_bonus_8_8"},{"rule_id":"aov_linepay_bonus_8_8pct_domestic_cap1000","scope":{"country":"TW","payment_method":"line_pay","exclude_categories":"excluded_categories"},"rate":0.088,"cap":{"period":"calendar_month","max_reward_twd":1000},"stackable":true,"priority":2,"exclusive_group":"aov_domestic_bonus_8_8","description":"LINE Pay 加碼 +8.8%（上限 1,000）"}],"payment_dictionary":{"supported_default":["physical_card","line_pay"]},"merchant_payment_restrictions":{"7-11":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行"],"taishin_pay":["台新銀行"]},"7-eleven":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行"],"taishin_pay":["台新銀行"]},"全家":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"taishin_pay":["台新銀行"]},"全家便利商店":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"taishin_pay":["台新銀行"]}}},{"card_id":"taishin_richart","bank":"台新銀行","card_name":"Richart 卡","card_network":"Mastercard","billing_currency":"TWD","foreign_transaction_fee":null,"reward_currency":"points","assumptions":{"user_level":"level2","autopay_enabled":true},"merchant_groups":{"tian_tian_shua":["7-11","全家","家樂福","大買家","唐吉訶德","LOPIA","臺鐵","高鐵","台灣大車隊","LINEGO","Yoxi","Uber","台灣Bolt","中油直營","全國加油","全國特急電","源點EVOASIS","華城電能EVALUE","USPACE","Autopass(車麻吉)","寶雅","康是美","屈臣氏","杏一醫療","大樹藥局","丁丁藥局","佑全保健藥妝","健康人生藥局"],"da_bi_shua":["新光三越(含skm pay)","遠東百貨","遠東SOGO","漢神巨蛋","漢神百貨","微風","台北101","遠東巨城","廣三SOGO","南紡購物中心","誠品生活(含線上)","京站","三創生活","夢時代","統一時代(含DREAM PLAZA)","中友百貨","Mitsui Shopping Park LaLaport(南港/台中)","MITSUI OUTLET PARK(林口/台中港/台南)","華泰名品城","SKM Park Outlets","IKEA","特力屋","HOLA","宜得利","瑪黑家居","UNIQLO","GU","ZARA","NET","lululemon"],"hao_xiang_shua":["全臺餐飲(不含餐券)","王品瘋Pay","Uber Eats","Foodpanda","拓元售票","KKTIX","年代售票","寬宏售票","OPENTIX兩廳院文化生活","FunNow","錢櫃","好樂迪","ONCOR","sing!go","享溫馨","晶華國際酒店集團","雲朗觀光","台灣萬豪國際集團旗下飯店","煙波國際觀光集團","老爺酒店集團","福華集團","漢來飯店事業群","台北君悅酒店","高雄洲際酒店","臺中勤美洲際酒店","礁溪寒沐酒店"],"shu_qu_shua":["蝦皮","momo","酷澎(Coupang)","PChome","淘寶","Amazon","東森","博客來","Richart Mart","PayEasy","iHerb","SHEIN","Farfetch","Olive Young","知識衛星","Amazing Talker","Tutor ABC","Hahow","PressPlay","MyCard","遊戲橘子","Steam","PlayStation","Nintendo","Netflix","Disney+","ChatGPT","Notion","Canva","Perplexity","Claude"],"wan_lv_shua":["海外消費(含實體及線上、歐洲國家交易)","中華航空","長榮航空","星宇航空","台灣虎航","國泰航空","華信航空","立榮航空","樂桃航空","阿聯酋航空","亞洲航空","酷航","捷星航空","新加坡航空","日本航空","越捷航空","Uber","Grab","SUICA","ICOCA","PASMO","WOWPASS","AIRSIM","Klook","KKday","Agoda","Booking.com","Trip.com","Airbnb","Hotels.com","Expedia","雄獅旅遊","易遊網","東南旅遊","可樂旅遊","長汎假期","五福旅遊","喜鴻假期","易飛旅遊","燦星旅遊","加利利旅行社","鳳凰國際旅行社","山富旅遊","行健旅遊"],"pay_zhe_shua_taishinpay_3_8_merchants":["7-11","全家","萊爾富","OK超商","寶雅","康是美","馬光中醫","小北百貨","楓康超市","九乘九","光南","撥筋堂","佑全保健藥妝","健康人生藥局","新光三越","IKEA","中友百貨","486團購","adidas","卡多摩","華山1914","SO NICE","50% Fifty Percent","比漾廣場","IROO","摩曼頓","Richart Mart","NET","ATT","捷運","55688","歐特儀停車","漢堡王","屋馬","采盟免稅店","Louisa","怡客","金韓食","色鼎","涮屋馬"]},"reward_rules":[{"rule_id":"richart_base_0_3pct","scope":{"country":"TW","channel":["online","offline"]},"rate":0.003,"cap":null,"stackable":true,"priority":1,"description":"一般消費 0.3%（無上限）"},{"rule_id":"richart_payzhe_taishinpay_3_5pct","scope":{"plan":"pay_zhe_shua","payment_method":"taishin_pay","channel":["online","offline"],"merchant_group_in":["pay_zhe_shua_taishinpay_3_8_merchants"]},"rate":0.032,"cap":null,"stackable":true,"priority":2,"requires":{"user_level":"level2","autopay_enabled":true},"description":"Pay著刷：台新Pay +3.2%（合計 3.5%；需切方案）","exclusive_group":"richart_plan_bonus"},{"rule_id":"richart_payzhe_linepay_2_3pct","scope":{"plan":"pay_zhe_shua","payment_method":"line_pay","channel":["online","offline"]},"rate":0.02,"cap":null,"stackable":true,"priority":2,"requires":{"user_level":"level2","autopay_enabled":true},"description":"Pay著刷：LINE Pay +2.0%（合計 2.3%；需切方案）","exclusive_group":"richart_plan_bonus"},{"rule_id":"richart_5plans_bonus_3_3pct","scope":{"requires_plan_switch":true,"plan_in":["tian_tian_shua","da_bi_shua","hao_xiang_shua","shu_qu_shua","wan_lv_shua"],"payment_method_in":["physical_card","taishin_pay","apple_pay","google_wallet","samsung_pay"],"merchant_group_in":["tian_tian_shua","da_bi_shua","hao_xiang_shua","shu_qu_shua","wan_lv_shua"]},"rate":0.03,"cap":null,"stackable":true,"priority":3,"requires":{"user_level":"level2","autopay_enabled":true},"description":"五大方案 +3.0%（合計 3.3%；需切方案）","exclusive_group":"richart_plan_bonus"},{"rule_id":"richart_weekend_shua_2pct","scope":{"plan":"weekend_shua","country":"TW","weekday":"weekend_or_holiday","payment_method_in":["physical_card","taishin_pay","apple_pay","google_wallet","samsung_pay","line_pay"],"channel":["online","offline"]},"rate":0.017,"cap":null,"stackable":true,"priority":3,"requires":{"user_level":"level2","autopay_enabled":true},"description":"假日刷 +1.7%（合計 2.0%；需切方案）","exclusive_group":"richart_plan_bonus"}],"payment_dictionary":{"supported_default":["physical_card","apple_pay","google_wallet","samsung_pay","line_pay","taishin_pay"]},"merchant_payment_restrictions":{"7-11":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行"],"taishin_pay":["台新銀行"]},"7-eleven":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行"],"taishin_pay":["台新銀行"]},"全家":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"taishin_pay":["台新銀行"]},"全家便利商店":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"taishin_pay":["台新銀行"]}}},{"card_id":"cathay_cube","bank":"國泰世華銀行","card_name":"CUBE 卡","card_network":"Mastercard","billing_currency":"TWD","foreign_transaction_fee":null,"reward_currency":"points","assumptions":{"user_level":"level2"},"merchant_groups":{"play_digital":["ChatGPT","Perplexity","Notion","Canva","Claude","Speak","Duolingo","Gamma","Apple 媒體服務","Google Play","Disney+","Netflix","Spotify","YouTube Premium","Max","蝦皮購物","momo","PChome 24h購物","小樹購","淘寶","天貓","Coupang 酷澎"],"le_savor":["Uber Eats","Foodpanda","王品瘋Pay","拓元售票","KKTIX","年代售票","寬宏售票","OPENTIX 兩廳院文化生活","FunNow","錢櫃","好樂迪","ONCOR","sing!go","享溫馨"],"fun_travel":["高鐵","臺鐵","Uber","Grab","SUICA","ICOCA","PASMO","Klook","KKday","Agoda","Booking.com","Trip.com","Airbnb","Hotels.com","Expedia"],"selected":["IKEA 宜家家居","家樂福","全聯福利中心","7-ELEVEN","全家便利商店","台灣中油 直營站","U-POWER","EVOASIS","EVALUE","TAIL","iCharging","車麻吉","uTagGo"]},"reward_rules":[{"rule_id":"cube_base_0_3pct","scope":{"channel":["online","offline"],"country":"ANY"},"rate":0.003,"cap":null,"stackable":true,"priority":1,"description":"一般消費 0.3%（無上限）"},{"rule_id":"cube_level2_specified_3pct","scope":{"requires_plan_switch":true,"plan_in":["play_digital","le_savor","fun_travel"],"merchant_group_in":["play_digital","le_savor","fun_travel"]},"rate":0.027,"cap":null,"stackable":true,"priority":2,"requires":{"user_level":"level2"},"description":"玩數位／樂饗購／趣旅行 +2.7%（合計 3%；需切方案）"},{"rule_id":"cube_selected_2pct","scope":{"requires_plan_switch":true,"plan":"selected","merchant_group":"selected"},"rate":0.017,"cap":null,"stackable":true,"priority":2,"description":"集精選 +1.7%（合計 2%；需切方案）"}],"payment_dictionary":{"supported_default":["physical_card","apple_pay","google_wallet","samsung_pay","line_pay"]},"merchant_payment_restrictions":{"7-11":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行"],"taishin_pay":["台新銀行"]},"7-eleven":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行"],"taishin_pay":["台新銀行"]},"全家":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"taishin_pay":["台新銀行"]},"全家便利商店":{"line_pay":["台新銀行"],"apple_pay":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"physical_card":["國泰世華銀行","玉山銀行","台新銀行","永豐銀行"],"taishin_pay":["台新銀行"]}}}];
+
+// ============================================================
+// ============================================================
+// Helpers
+// ============================================================
+const MERCHANT_ALIASES = {
+  '7-eleven': '7-11',
+  '7eleven': '7-11',
+  '7 eleven': '7-11',
+  '蝦皮購物': '蝦皮',
+  '全家便利商店': '全家',
+};
+
+const MERCHANT_DISPLAY_NAMES = {
+  '7-11': '7-11',
+  '蝦皮': '蝦皮',
+  '全家': '全家',
+};
+
+function normMerchant(str) {
+  const s = String(str || '').trim().toLowerCase();
+  return MERCHANT_ALIASES[s] || s;
+}
+
+function getMerchantDisplayName(str) {
+  const normalized = normMerchant(str);
+  return MERCHANT_DISPLAY_NAMES[normalized] || str;
+}
+
+// All merchants for autocomplete
+// ============================================================
+const ALL_MERCHANTS = (() => {
+  const map = {};
+  for (const card of CARDS) {
+    if (!card.merchant_groups) continue;
+    for (const merchants of Object.values(card.merchant_groups)) {
+      for (const merchant of merchants) {
+        const displayName = getMerchantDisplayName(merchant);
+        if (!map[displayName]) map[displayName] = [];
+        if (!map[displayName].includes(card.card_name)) map[displayName].push(card.card_name);
+      }
+    }
+  }
+  return map;
+})();
+
+function isPaymentAllowed(pm, merchant, card) {
+  if (!merchant) return true;
+  const restrictions = card.merchant_payment_restrictions || {};
+  const nm = normMerchant(merchant);
+  for (const [key, rules] of Object.entries(restrictions)) {
+    const nk = normMerchant(key);
+    if (nm === nk || nm.includes(nk) || nk.includes(nm)) {
+      if (!(pm in rules)) return true;
+      return rules[pm].includes(card.bank);
+    }
+  }
+  return true;
+}
+
+function merchantInGroup(merchant, card, groupKey) {
+  const groups = card.merchant_groups || {};
+  const list = groups[groupKey] || [];
+  const nm = normMerchant(merchant);
+  return list.some(m => normMerchant(m) === nm || nm.includes(normMerchant(m)) || normMerchant(m).includes(nm));
+}
+
+function scopeMatches(scope, ctx, card) {
+  // country
+  if (scope.country && scope.country !== 'ANY') {
+    if (ctx.country !== scope.country) return false;
+  }
+  // foreign
+  if (scope.foreign !== undefined) {
+    const isForeign = ctx.country !== 'TW';
+    if (scope.foreign !== isForeign) return false;
+  }
+  // channel
+  if (scope.channel && scope.channel.length > 0) {
+    if (!scope.channel.includes(ctx.channel)) return false;
+  }
+  // country_in
+  if (scope.country_in) {
+    if (!scope.country_in.includes(ctx.country)) return false;
+  }
+  // Use _allowedPayments (filtered by merchant restrictions) if available
+  const effPay = ctx._allowedPayments !== undefined ? ctx._allowedPayments : ctx.payments;
+  // payment_method (single — exact match required)
+  if (scope.payment_method) {
+    if (!effPay || !effPay.includes(scope.payment_method)) return false;
+  }
+  // payment_method_in — ctx must include at least one from list
+  if (scope.payment_method_in) {
+    if (!effPay || !effPay.some(p => scope.payment_method_in.includes(p))) return false;
+  }
+  // merchant_group
+  if (scope.merchant_group) {
+    if (!ctx.merchant) return false;
+    if (!merchantInGroup(ctx.merchant, card, scope.merchant_group)) return false;
+  }
+  // merchant_group_in — merchant must match at least one group
+  if (scope.merchant_group_in) {
+    if (!ctx.merchant) return false;
+    const matched = scope.merchant_group_in.some(gk => merchantInGroup(ctx.merchant, card, gk));
+    if (!matched) return false;
+  }
+  // requires_plan_switch — needs merchant to match a plan group AND payment to be eligible
+  // (this is handled by the merchant_group_in + payment_method_in checks above, so just pass)
+  // weekday
+  if (scope.weekday === 'weekend_or_holiday') {
+    if (!ctx.isWeekend) return false;
+  }
+  return true;
+}
+
+function calcRewardForCard(card, ctx, fxRate) {
+  // Pre-filter payments by merchant restrictions
+  const _allowedPayments = ctx.payments
+    ? ctx.payments.filter(pm => isPaymentAllowed(pm, ctx.merchant, card))
+    : null;
+  if (ctx.payments && ctx.merchant && _allowedPayments.length === 0) {
+    return {
+      card,
+      amountTWD: ctx.currency === 'TWD' ? ctx.amount : ctx.amount * fxRate,
+      netRewardTWD: 0,
+      effectiveRate: 0,
+      ruleDetails: [],
+      notes: [{ type: 'warning', text: '此通路不支援這張卡' }],
+      needsPlanSwitch: false,
+      fxFee: 0,
+      usedPayments: ctx.payments,
+    };
+  }
+  const effectiveCtx = { ...ctx, _allowedPayments };
+  const amountTWD = ctx.currency === 'TWD'
+    ? ctx.amount
+    : ctx.amount * fxRate;
+
+  // Foreign tx fee
+  const isForeign = ctx.country !== 'TW';
+  const fxFee = (isForeign && card.foreign_transaction_fee != null)
+    ? card.foreign_transaction_fee * amountTWD : 0;
+
+  // ctx.payments is an array of selected payment methods
+  // Filter applicable rules
+  const applicableRules = card.reward_rules.filter(r => scopeMatches(r.scope || {}, effectiveCtx, card));
+
+  // Exclusive group handling: among same exclusive_group, keep max rate
+  const exclusiveGroups = {};
+  const nonExclusiveRules = [];
+  for (const rule of applicableRules) {
+    if (rule.exclusive_group) {
+      if (!exclusiveGroups[rule.exclusive_group]) exclusiveGroups[rule.exclusive_group] = [];
+      exclusiveGroups[rule.exclusive_group].push(rule);
+    } else {
+      nonExclusiveRules.push(rule);
+    }
+  }
+
+  // Pick best from each exclusive group
+  const chosenExclusive = Object.values(exclusiveGroups).map(rules =>
+    rules.sort((a, b) => b.rate - a.rate)[0]
+  );
+
+  const allChosen = [...nonExclusiveRules, ...chosenExclusive];
+
+  // If any non-stackable rule with priority >= 10, use that alone
+  const highPriorityNonStack = allChosen.filter(r => r.stackable === false && (r.priority || 0) >= 10);
+  let finalRules;
+  if (highPriorityNonStack.length > 0) {
+    finalRules = [highPriorityNonStack[0]];
+  } else {
+    finalRules = allChosen;
+  }
+
+  // Calculate reward per rule
+  let totalRewardTWD = 0;
+  const ruleDetails = [];
+
+  for (const rule of finalRules) {
+    let reward = rule.rate * amountTWD;
+    if (rule.cap) {
+      reward = Math.min(reward, rule.cap.max_reward_twd);
+    }
+    totalRewardTWD += reward;
+    ruleDetails.push({ rule, rewardTWD: reward });
+  }
+
+  const netRewardTWD = totalRewardTWD - fxFee;
+  const effectiveRate = amountTWD > 0 ? (netRewardTWD / amountTWD) : 0;
+
+  const needsPlanSwitch = finalRules.some(r => r.scope && r.scope.requires_plan_switch);
+  const planSwitchRules = finalRules.filter(r => r.scope && r.scope.requires_plan_switch);
+
+  // Plan name lookup map
+  const PLAN_NAMES = {
+    tian_tian_shua: '天天刷', da_bi_shua: '大筆刷', hao_xiang_shua: '好饗刷',
+    shu_qu_shua: '數趣刷', wan_lv_shua: '玩旅刷', pay_zhe_shua: 'Pay著刷',
+    weekend_shua: '假日刷', play_digital: '玩數位', le_savor: '樂饗購',
+    fun_travel: '趣旅行', selected: '集精選',
+  };
+
+  const notes = [];
+  if (fxFee > 0) notes.push({ type: 'warning', text: `含海外手續費扣除 -${fxFee.toFixed(0)} TWD` });
+  if (needsPlanSwitch) {
+    // Collect all plan names from matched rules
+    const planNames = new Set();
+    for (const r of planSwitchRules) {
+      const scope = r.scope || {};
+      const plans = scope.plan_in || (scope.plan ? [scope.plan] : []);
+      // Find which plan matched the merchant
+      for (const p of plans) {
+        const groupKey = p; // plan keys match merchant_group keys
+        if (merchantInGroup(ctx.merchant, card, groupKey)) {
+          planNames.add(PLAN_NAMES[p] || p);
+        }
+      }
+      if (planNames.size === 0) {
+        // fallback: show all plan options
+        plans.forEach(p => planNames.add(PLAN_NAMES[p] || p));
+      }
+    }
+    const planLabel = planNames.size > 0 ? [...planNames].join('／') : '對應方案';
+    notes.push({ type: 'action', text: `需切換方案：${planLabel}` });
+  }
+  const cappedRules = finalRules.filter(r => r.cap && r.rate * amountTWD > r.cap.max_reward_twd);
+  for (const r of cappedRules) {
+    notes.push({ type: 'warning', text: `${r.description.split('（')[0]} 已達上限 ${r.cap.max_reward_twd} TWD` });
+  }
+
+  return {
+    card,
+    amountTWD,
+    netRewardTWD: Math.max(0, netRewardTWD),
+    effectiveRate,
+    ruleDetails,
+    notes,
+    needsPlanSwitch,
+    fxFee,
+    usedPayments: ctx.payments,
+  };
+}
+
+// Try all supported payment combinations to find best result for a card
+function calcWithBestPayment(card, ctx, fxRate) {
+  const supported = card.payment_dictionary
+    ? Object.values(card.payment_dictionary).flat()
+    : ['physical_card'];
+  // Filter by merchant payment restrictions
+  const uniquePayments = [...new Set(supported)].filter(pm =>
+    isPaymentAllowed(pm, ctx.merchant, card)
+  );
+  if (ctx.merchant && uniquePayments.length === 0) {
+    return {
+      card,
+      amountTWD: ctx.currency === 'TWD' ? ctx.amount : ctx.amount * fxRate,
+      netRewardTWD: 0,
+      effectiveRate: 0,
+      ruleDetails: [],
+      notes: [{ type: 'warning', text: '此通路不支援這張卡' }],
+      needsPlanSwitch: false,
+      fxFee: 0,
+      usedPayments: null,
+      suggestedPayment: null,
+    };
+  }
+  let best = null;
+  for (const pm of uniquePayments) {
+    const result = calcRewardForCard(card, { ...ctx, payments: [pm] }, fxRate);
+    if (!best || result.netRewardTWD > best.netRewardTWD) {
+      best = { ...result, suggestedPayment: pm };
+    }
+  }
+  if (ctx.payments && ctx.payments.length > 0) {
+    const allowedSpecified = ctx.payments.filter(pm => isPaymentAllowed(pm, ctx.merchant, card));
+    if (allowedSpecified.length > 0) {
+      const result = calcRewardForCard(card, { ...ctx, payments: allowedSpecified }, fxRate);
+      if (!best || result.netRewardTWD >= best.netRewardTWD) {
+        best = { ...result, suggestedPayment: allowedSpecified[0] };
+      }
+    }
+  }
+  if (!best) {
+    best = { ...calcRewardForCard(card, { ...ctx, payments: ['physical_card'] }, fxRate), suggestedPayment: 'physical_card' };
+  }
+  return best;
+}
+
+// ============================================================
+// Payment display names
+// ============================================================
+const PAY_NAMES = {
+  line_pay: 'LINE Pay',
+  apple_pay: 'Apple Pay',
+  physical_card: '實體卡',
+  taishin_pay: '台新Pay',
+};
+
+function getPaymentActionText(result, paymentMethod) {
+  const payName = PAY_NAMES[paymentMethod] || paymentMethod;
+  const requiresApplePayForSport = result.card.card_id === 'sinopac_sport' && paymentMethod === 'apple_pay';
+  return requiresApplePayForSport ? `必須使用 ${payName}` : `建議使用 ${payName}`;
+}
+
+// ============================================================
+// UI helpers
+// ============================================================
+function setToggle(groupId, el) {
+  document.querySelectorAll(`#${groupId} .toggle`).forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function toggleMulti(el) {
+  el.classList.toggle('active');
+}
+
+function getToggleVal(groupId) {
+  const active = document.querySelector(`#${groupId} .toggle.active`);
+  return active ? active.dataset.val : '';
+}
+
+function getMultiToggleVals(groupId) {
+  return [...document.querySelectorAll(`#${groupId} .toggle.active`)].map(t => t.dataset.val);
+}
+
+// Currency FX row
+document.getElementById('currency').addEventListener('change', function() {
+  const fxRow = document.getElementById('fx-row');
+  const label = document.getElementById('fx-currency-label');
+  if (this.value !== 'TWD') {
+    fxRow.style.display = 'flex';
+    label.textContent = this.value;
+  } else {
+    fxRow.style.display = 'none';
+  }
+});
+
+// Autocomplete
+const merchantInput = document.getElementById('merchant');
+const autocompleteList = document.getElementById('autocomplete-list');
+
+merchantInput.addEventListener('input', function() {
+  const val = this.value.trim().toLowerCase();
+  if (!val) { autocompleteList.classList.remove('visible'); return; }
+  const matches = Object.entries(ALL_MERCHANTS)
+    .filter(([m]) => m.toLowerCase().includes(val))
+    .slice(0, 8);
+  if (matches.length === 0) { autocompleteList.classList.remove('visible'); return; }
+  autocompleteList.innerHTML = matches.map(([m, cards]) =>
+    `<div class="autocomplete-item" onclick="selectMerchant('${m.replace(/'/g, "\\'")}')">
+      <span>${m}</span>
+      <span class="autocomplete-tag">${cards.length} 張卡有優惠</span>
+    </div>`
+  ).join('');
+  autocompleteList.classList.add('visible');
+});
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.merchant-input-wrap')) autocompleteList.classList.remove('visible');
+});
+
+function selectMerchant(name) {
+  merchantInput.value = name;
+  autocompleteList.classList.remove('visible');
+}
+
+// ============================================================
+// Main calculate
+// ============================================================
+function calculate() {
+  const amount = parseFloat(document.getElementById('amount').value);
+  const currency = document.getElementById('currency').value;
+  const merchant = document.getElementById('merchant').value.trim();
+  const country = document.getElementById('country').value;
+  const channel = getToggleVal('channel-group') || 'online';
+  const isWeekend = getToggleVal('weekend-group') === 'weekend';
+  const specifiedPayments = getMultiToggleVals('payment-group'); // array, may be empty
+
+  if (!amount || amount <= 0) {
+    showError('請輸入有效的消費金額');
+    return;
+  }
+
+  let fxRate = 1;
+  if (currency !== 'TWD') {
+    fxRate = parseFloat(document.getElementById('fx-rate').value);
+    if (!fxRate || fxRate <= 0) {
+      showError(`請輸入 ${currency} 對台幣的即時匯率`);
+      return;
+    }
+  }
+
+  const ctx = { amount, currency, country, channel, isWeekend, merchant, payments: specifiedPayments.length > 0 ? specifiedPayments : null };
+  const amountTWD = currency === 'TWD' ? amount : amount * fxRate;
+
+  // Calculate all cards
+  const results = CARDS.map(card => {
+    if (ctx.payments) {
+      return calcRewardForCard(card, ctx, fxRate);
+    } else {
+      return calcWithBestPayment(card, ctx, fxRate);
+    }
+  });
+
+  results.sort((a, b) => b.netRewardTWD - a.netRewardTWD);
+
+  const top3 = results.slice(0, 3);
+  renderResults(top3, ctx, amountTWD, currency, fxRate, results);
+}
+
+function showError(msg) {
+  document.getElementById('results').innerHTML = `<div class="error-box">⚠ ${msg}</div>`;
+}
+
+function renderResults(top3, ctx, amountTWD, currency, fxRate, allResults) {
+  const rankLabels = ['#1 最佳', '#2 次選', '#3 備選'];
+  const rankClasses = ['rank-1', 'rank-2', 'rank-3'];
+
+  let html = `<div class="results-header">
+    <span class="results-title">回饋排名</span>
+    <span class="context-summary">${ctx.merchant || '一般消費'} · ${amountTWD.toFixed(0)} TWD</span>
+  </div>`;
+
+  for (let i = 0; i < top3.length; i++) {
+    const r = top3[i];
+    if (r.netRewardTWD <= 0 && i > 0) continue;
+
+    // Rate breakdown pills
+    const pills = r.ruleDetails.map((rd, idx) => {
+      const pct = (rd.rule.rate * 100).toFixed(1);
+      if (idx === 0) return `<span class="rate-pill main">${pct}%</span>`;
+      return `<span class="rate-pill plus">+${pct}%</span>`;
+    });
+    if (r.ruleDetails.length > 1) {
+      const totalRate = (r.effectiveRate * 100).toFixed(2);
+      pills.push(`<span class="rate-pill total">= ${totalRate}%</span>`);
+    }
+
+    // Payment suggestion — only if user didn't specify, and best payment isn't physical card
+    if (!ctx.payments && r.suggestedPayment && r.suggestedPayment !== 'physical_card') {
+      r.notes = [...(r.notes || [])];
+      r.notes.push({ type: 'action', text: getPaymentActionText(r, r.suggestedPayment) });
+    }
+
+    const notesHtml = (r.notes || []).map(n =>
+      `<div class="note ${n.type}"><span class="note-icon">${n.type === 'warning' ? '⚠' : n.type === 'action' ? '→' : '·'}</span><span>${n.text}</span></div>`
+    ).join('');
+
+    html += `
+    <div class="card-result ${rankClasses[i]}">
+      <div class="rank-badge"></div>
+      <div class="card-result-inner">
+        <div class="card-header">
+          <div class="card-info">
+            <div class="rank-label">${rankLabels[i]}</div>
+            <div class="card-name">${r.card.card_name}</div>
+            <div class="card-bank">${r.card.bank}</div>
+          </div>
+          <div class="reward-amount">
+            <div class="reward-value">NT$ ${Math.round(r.netRewardTWD)}</div>
+            <div class="reward-label">預估回饋</div>
+          </div>
+        </div>
+        <div class="rate-breakdown">${pills.join('')}</div>
+        ${notesHtml ? `<div class="divider"></div><div class="card-notes">${notesHtml}</div>` : ''}
+      </div>
+    </div>`;
+  }
+
+  // Best recommendation sentence
+  const best = top3[0];
+  const bestPayName = (!ctx.payments && best.suggestedPayment) ? PAY_NAMES[best.suggestedPayment] || best.suggestedPayment : null;
+  const requiresSpecificPayment = !ctx.payments && best.suggestedPayment && best.card.card_id === 'sinopac_sport' && best.suggestedPayment === 'apple_pay';
+  const payTip = bestPayName && bestPayName !== '實體卡'
+    ? `${requiresSpecificPayment ? '，必須使用' : '，使用'} <strong>${bestPayName}</strong>`
+    : '';
+  const planTip = best.needsPlanSwitch ? '（請記得切換對應方案）' : '';
+
+  html += `<div class="best-rec">
+    💡 建議刷 <strong>${best.card.card_name}</strong>${payTip}，可獲回饋 <strong>NT$${Math.round(best.netRewardTWD)}</strong>（約 ${(best.effectiveRate * 100).toFixed(2)}%）${planTip}。
+    ${best.notes.some(n => n.type === 'warning') ? '<br><span style="color:var(--text2);font-size:12px">⚠ 部分規則已達上限，實際回饋以當期剩餘額度為準。</span>' : ''}
+  </div>`;
+
+  document.getElementById('results').innerHTML = html;
+}
+</script>
+</body>
+</html>
