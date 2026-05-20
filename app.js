@@ -509,8 +509,16 @@ function calculate() {
 
   // Calculate all cards
   const results = CARDS.map(card => {
-    if (ctx.payments) {
-      return calcRewardForCard(card, ctx, fxRate);
+    if (ctx.payments && ctx.payments.length > 0) {
+      // Try each selected payment individually, return the best result
+      let best = null;
+      for (const pm of ctx.payments) {
+        const r = calcRewardForCard(card, { ...ctx, payments: [pm] }, fxRate);
+        if (!best || r.netRewardTWD > best.netRewardTWD) {
+          best = { ...r, suggestedPayment: pm };
+        }
+      }
+      return best;
     } else {
       return calcWithBestPayment(card, ctx, fxRate);
     }
