@@ -109,12 +109,30 @@ const CARDS = [
         "rate": 0.04,
         "cap": {
           "period": "calendar_month",
-          "max_reward_twd": 300,
+          "max_reward_twd": 800,
           "cap_applies_to": "this_rule_only"
         },
+        "shared_cap_group": "bibei_4pct_bonus",
         "stackable": true,
         "priority": 3,
-        "description": "精選商家加碼 +4%（每月上限 300；可與基本/任務疊加）"
+        "description": "精選商家加碼 +4%（每月上限 800；可與基本/任務疊加）"
+      },
+      {
+        "rule_id": "bibei_foreign_offline_4pct_cap300",
+        "scope": {
+          "foreign": true,
+          "channel": ["offline"]
+        },
+        "rate": 0.04,
+        "cap": {
+          "period": "calendar_month",
+          "max_reward_twd": 800,
+          "cap_applies_to": "this_rule_only"
+        },
+        "shared_cap_group": "bibei_4pct_bonus",
+        "stackable": true,
+        "priority": 3,
+        "description": "海外實體消費加碼 +4%（每月上限 800；可與基本/任務疊加）"
       }
     ],
     "payment_dictionary": {

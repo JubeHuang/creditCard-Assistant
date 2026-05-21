@@ -626,4 +626,14 @@
     .input-row.triple { grid-template-columns: 1fr 1fr; }
     h1 { font-size: 22px; }
     header, .input-panel, #results { padding-left: 16px; padding-right: 16px; }
+
+    .fx-row {
+      flex-wrap: wrap;
+      row-gap: 8px;
+    }
+
+    .fx-input {
+      width: 90px !important;
+    }
+
   }

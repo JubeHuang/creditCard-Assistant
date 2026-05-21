@@ -181,12 +181,21 @@ function calcRewardForCard(card, ctx, fxRate) {
   // Calculate reward per rule
   let totalRewardTWD = 0;
   const ruleDetails = [];
+  const sharedCapUsed = {}; // shared_cap_group -> amount used so far
 
   for (const rule of finalRules) {
     let reward = rule.rate * amountTWD;
-    if (rule.cap) {
+
+    if (rule.shared_cap_group && rule.cap) {
+      // Shared cap: total across all rules in the group cannot exceed cap
+      const used = sharedCapUsed[rule.shared_cap_group] || 0;
+      const remaining = Math.max(0, rule.cap.max_reward_twd - used);
+      reward = Math.min(reward, remaining);
+      sharedCapUsed[rule.shared_cap_group] = used + reward;
+    } else if (rule.cap) {
       reward = Math.min(reward, rule.cap.max_reward_twd);
     }
+
     totalRewardTWD += reward;
     ruleDetails.push({ rule, rewardTWD: reward });
   }
@@ -229,7 +238,11 @@ function calcRewardForCard(card, ctx, fxRate) {
     const planLabel = planNames.size > 0 ? [...planNames].join('／') : '對應方案';
     notes.push({ type: 'action', text: `需切換方案：${planLabel}` });
   }
-  const cappedRules = finalRules.filter(r => r.cap && r.rate * amountTWD > r.cap.max_reward_twd);
+  const cappedRules = finalRules.filter(r => {
+    if (!r.cap) return false;
+    const rd = ruleDetails.find(d => d.rule === r);
+    return rd && r.rate * amountTWD > rd.rewardTWD;
+  });
   for (const r of cappedRules) {
     notes.push({ type: 'warning', text: `${(r.description || '此優惠').split('（')[0]} 已達上限 ${r.cap.max_reward_twd} TWD` });
   }
