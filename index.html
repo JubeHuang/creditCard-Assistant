@@ -132,8 +132,9 @@
 
 </div>
 
-<!-- cards.js 必須在 app.js 之前載入 -->
+<!-- 資料載入順序：卡片權益 → 固定使用者資格 → 計算邏輯 -->
 <script src="cards.js"></script>
+<script src="userProfile.js"></script>
 <script src="app.js"></script>
 <script>
   if ('serviceWorker' in navigator) {
