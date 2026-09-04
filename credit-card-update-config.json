@@ -1,0 +1,42 @@
+{
+  "global_rules": {
+    "exclude_new_customer_offers": true,
+    "exclude_offer_types": [
+      "新戶限定",
+      "新卡友限定",
+      "首刷禮",
+      "首次申辦",
+      "首次綁定",
+      "首次使用限定",
+      "新客限定"
+    ],
+    "source_priority": "official_bank_only"
+  },
+  "cards": [
+    {
+      "card_id": "sinopac_bibei_usd",
+      "card_name": "幣倍卡（美元）",
+      "source_url": "https://bank.sinopac.com/sinopacBT/personal/credit-card/introduction/bankcard/dual-currency-card.html#list0"
+    },
+    {
+      "card_id": "esun_kumamon_jpy",
+      "card_name": "熊本熊卡（日圓雙幣）",
+      "source_url": "https://www.esunbank.com/zh-tw/personal/credit-card/intro/bank-card/kumamon_card#2"
+    },
+    {
+      "card_id": "esun_ubear",
+      "card_name": "U Bear 卡",
+      "source_url": "https://www.esunbank.com/zh-tw/personal/credit-card/intro/bank-card/u-bear#2"
+    },
+    {
+      "card_id": "sinopac_dawho",
+      "card_name": "DAWHO 現金回饋卡",
+      "source_url": "https://bank.sinopac.com/sinopacBT/personal/credit-card/introduction/bankcard/DAWHO.html"
+    },
+    {
+      "card_id": "sinopac_sport",
+      "card_name": "SPORT 卡",
+      "source_url": "https://bank.sinopac.com/sinopacBT/personal/credit-card/introduction/bankcard/sportcard.html"
+    }
+  ]
+}
