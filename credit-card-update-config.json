@@ -10,7 +10,9 @@
       "首次使用限定",
       "新客限定"
     ],
-    "source_priority": "official_bank_only"
+    "source_priority": "official_bank_only",
+    "review_embedded_images": true,
+    "review_rule": "更新權益時必須同時檢查官方頁面的可見文字、權益圖卡與圖片內文字；不得只依 HTML 可擷取文字判斷。"
   },
   "cards": [
     {
