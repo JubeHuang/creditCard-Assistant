@@ -47,6 +47,16 @@ const ALL_MERCHANTS = (() => {
   return map;
 })();
 
+// Keep the buttons and automatic recommendations on the same country policy.
+const PAYMENTS_BY_COUNTRY = {
+  TW: ['line_pay', 'apple_pay', 'physical_card', 'taishin_pay', 'fullpay'],
+  JP: ['line_pay', 'apple_pay', 'physical_card', 'taishin_pay_plus', 'paypay'],
+  KR: ['line_pay', 'apple_pay', 'physical_card', 'taishin_pay_plus'],
+};
+function isPaymentAvailableInCountry(pm, country) {
+  return (PAYMENTS_BY_COUNTRY[country] || ['apple_pay', 'physical_card']).includes(pm);
+}
+
 function isPaymentAllowed(pm, merchant, card) {
   if (!merchant) return true;
   const restrictions = card.merchant_payment_restrictions || {};
@@ -77,6 +87,11 @@ function scopeMatches(scope, ctx, card) {
   if (scope.foreign !== undefined) {
     const isForeign = ctx.country !== 'TW';
     if (scope.foreign !== isForeign) return false;
+  }
+  // foreign currency (independent from purchase location)
+  if (scope.foreign_currency !== undefined) {
+    const isForeignCurrency = ctx.currency !== 'TWD';
+    if (scope.foreign_currency !== isForeignCurrency) return false;
   }
   // channel
   if (scope.channel && scope.channel.length > 0) {
@@ -111,15 +126,44 @@ function scopeMatches(scope, ctx, card) {
   // (this is handled by the merchant_group_in + payment_method_in checks above, so just pass)
   // weekday
   if (scope.weekday === 'weekend_or_holiday') {
-    if (!ctx.isWeekend) return false;
+    // No purchase-date input: do not assume eligibility for holiday-only bonuses.
+    return false;
   }
   return true;
+}
+
+// Spending thresholds use the bonus rate, not the combined or net reward rate.
+function getSpendingLimitNotes(ruleDetails) {
+  const periods = { statement_cycle: '每帳單週期', calendar_month: '每月', quarter: '每季' };
+  const groups = new Map();
+  for (const { rule } of ruleDetails) {
+    if (!rule.cap || !(rule.rate > 0)) continue;
+    const key = rule.shared_cap_group || rule.rule_id;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(rule);
+  }
+  if (!groups.size) return ruleDetails.length ? [{ type: 'info', text: '本次適用回饋：無刷卡金額上限' }] : [];
+  const notes = [...groups.values()].map(rules => {
+    const first = rules[0];
+    const rate = rules.reduce((sum, rule) => sum + rule.rate, 0);
+    const limit = first.cap.max_reward_twd / rate;
+    const format = value => value.toLocaleString('zh-TW', { maximumFractionDigits: 2 });
+    const labels = [...new Set(rules.map(rule => rule.display_name || (rule.description || '加碼回饋').split('（')[0]))].join('／');
+    const period = periods[first.cap.period] || '活動期間';
+    const shared = first.shared_cap_group ? '；與其他適用通路共用額度' : '';
+    return { type: 'info', text: `${labels}：${period}刷卡上限約 NT$${format(limit)}（回饋上限 NT$${format(first.cap.max_reward_twd)}${shared}）` };
+  });
+  notes.push({ type: 'info', text: '刷卡上限為完整回饋額度換算，外幣以折合台幣計；未扣除本期已使用額度。' });
+  if (ruleDetails.some(({ rule }) => !rule.cap)) {
+    notes.push({ type: 'info', text: '有上限的加碼用完後，無上限的回饋仍繼續計算。' });
+  }
+  return notes;
 }
 
 function calcRewardForCard(card, ctx, fxRate) {
   // Pre-filter payments by merchant restrictions
   const _allowedPayments = ctx.payments
-    ? ctx.payments.filter(pm => isPaymentAllowed(pm, ctx.merchant, card))
+    ? ctx.payments.filter(pm => isPaymentAvailableInCountry(pm, ctx.country) && isPaymentAllowed(pm, ctx.merchant, card))
     : null;
   if (ctx.payments && ctx.merchant && _allowedPayments.length === 0) {
     return {
@@ -164,7 +208,10 @@ function calcRewardForCard(card, ctx, fxRate) {
 
   // Pick best from each exclusive group
   const chosenExclusive = Object.values(exclusiveGroups).map(rules =>
-    rules.sort((a, b) => b.rate - a.rate)[0]
+    rules.sort((a, b) => b.rate - a.rate ||
+      // Prefer Chill's specific merchant label when another plan has the same rate.
+      Number(b.scope?.plan === 'chill_shua') - Number(a.scope?.plan === 'chill_shua')
+    )[0]
   );
 
   const allChosen = [...nonExclusiveRules, ...chosenExclusive];
@@ -210,13 +257,20 @@ function calcRewardForCard(card, ctx, fxRate) {
   const PLAN_NAMES = {
     tian_tian_shua: '天天刷', da_bi_shua: '大筆刷', hao_xiang_shua: '好饗刷',
     shu_qu_shua: '數趣刷', wan_lv_shua: '玩旅刷', pay_zhe_shua: 'Pay著刷',
-    weekend_shua: '假日刷', play_digital: '玩數位', le_savor: '樂饗購',
+    weekend_shua: '假日刷', chill_shua: 'Chill刷', play_digital: '玩數位', le_savor: '樂饗購',
     fun_travel: '趣旅行', selected: '集精選',
   };
 
-  const notes = [];
+  const notes = getSpendingLimitNotes(ruleDetails);
+  for (const label of new Set(finalRules.map(r => r.display_name).filter(Boolean))) {
+    notes.push({ type: 'info', text: label });
+  }
+  if (ctx.country === 'KR' && _allowedPayments?.includes('taishin_pay_plus') &&
+      ctx.merchant && merchantInGroup(ctx.merchant, card, 'taishin_pay_plus_kr')) {
+    notes.push({ type: 'info', text: '韓國台新Pay+合作店家；請確認門市櫃台支援，實際受理依現場標示為準。' });
+  }
   if (fxFee > 0) notes.push({ type: 'warning', text: `含海外手續費扣除 -${fxFee.toFixed(0)} TWD` });
-  if (isForeign && paymentHasFeeWaiver) notes.push({ type: 'action', text: '本次使用 PayPay，免收 1.5% 國外交易服務費' });
+  if (isForeign && paymentHasFeeWaiver) notes.push({ type: 'action', text: '本次支付方式免收 1.5% 國外交易服務費' });
   if (needsPlanSwitch) {
     // Collect all plan names from matched rules
     const planNames = new Set();
@@ -267,7 +321,7 @@ function calcWithBestPayment(card, ctx, fxRate) {
     : ['physical_card'];
   // Filter by merchant payment restrictions
   const uniquePayments = [...new Set(supported)].filter(pm =>
-    isPaymentAllowed(pm, ctx.merchant, card)
+    isPaymentAvailableInCountry(pm, ctx.country) && isPaymentAllowed(pm, ctx.merchant, card)
   );
   if (ctx.merchant && uniquePayments.length === 0) {
     return {
@@ -291,7 +345,7 @@ function calcWithBestPayment(card, ctx, fxRate) {
     }
   }
   if (ctx.payments && ctx.payments.length > 0) {
-    const allowedSpecified = ctx.payments.filter(pm => isPaymentAllowed(pm, ctx.merchant, card));
+    const allowedSpecified = ctx.payments.filter(pm => isPaymentAvailableInCountry(pm, ctx.country) && isPaymentAllowed(pm, ctx.merchant, card));
     if (allowedSpecified.length > 0) {
       const result = calcRewardForCard(card, { ...ctx, payments: allowedSpecified }, fxRate);
       if (!best || result.netRewardTWD >= best.netRewardTWD) {
@@ -313,6 +367,8 @@ const PAY_NAMES = {
   apple_pay: 'Apple Pay',
   physical_card: '實體卡',
   taishin_pay: '台新Pay',
+  taishin_pay_plus: '台新Pay+',
+  fullpay: '全盈+Pay',
   paypay: 'PayPay',
 };
 
@@ -400,10 +456,13 @@ function renderCardList() {
     card.reward_rules.filter(r => r.valid_until && r.valid_until !== card.promo_until).forEach(r => {
       const expiry = new Date(r.valid_until);
       const daysLeft = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
-      if (daysLeft >= 0) promoDates.push({ date: r.valid_until, daysLeft, label: r.description?.split('（')[0] || '限時優惠' });
+      if (daysLeft >= 0) promoDates.push({ date: r.valid_until, daysLeft, label: r.display_name || r.description?.split('（')[0] || '限時優惠' });
     });
 
-    const promos = promoDates.map(({ date, daysLeft, label }) => {
+    const uniquePromoDates = promoDates.filter((promo, index, all) =>
+      all.findIndex(other => other.date === promo.date && other.label === promo.label) === index
+    );
+    const promos = uniquePromoDates.map(({ date, daysLeft, label }) => {
       const dateStr = date.slice(5).replace('-', '/');
       const text = daysLeft <= 30
         ? `⚠ ${label}剩 ${daysLeft} 天（至 ${dateStr}）`
@@ -428,26 +487,19 @@ function toggleCardList() {
   toggle.classList.toggle('open');
 }
 
-// PayPay only available in Japan
-function updatePayPayAvailability() {
+function updatePaymentAvailability() {
   const country = document.getElementById('country').value;
-  const paypayBtn = document.querySelector('#payment-group .toggle[data-val="paypay"]');
-  if (!paypayBtn) return;
-  if (country !== 'JP') {
-    paypayBtn.classList.remove('active');
-    paypayBtn.disabled = true;
-    paypayBtn.style.opacity = '0.35';
-    paypayBtn.style.cursor = 'not-allowed';
-    paypayBtn.title = '僅限日本消費';
-  } else {
-    paypayBtn.disabled = false;
-    paypayBtn.style.opacity = '';
-    paypayBtn.style.cursor = '';
-    paypayBtn.title = '';
-  }
+  document.querySelectorAll('#payment-group .toggle').forEach(button => {
+    const available = isPaymentAvailableInCountry(button.dataset.val, country);
+    button.hidden = !available;
+    button.disabled = !available;
+    if (!available) button.classList.remove('active');
+  });
+  // A ranking calculated for the previous country is no longer applicable.
+  document.getElementById('results').innerHTML = '<div class="empty-state"><div class="empty-text">輸入消費情境後點擊計算<br>即可看到持有卡片的回饋排名</div></div>';
 }
-document.getElementById('country').addEventListener('change', updatePayPayAvailability);
-updatePayPayAvailability();
+document.getElementById('country').addEventListener('change', updatePaymentAvailability);
+updatePaymentAvailability();
 renderCardList();
 
 // Currency FX row
@@ -500,8 +552,8 @@ function calculate() {
   const merchant = document.getElementById('merchant').value.trim();
   const country = document.getElementById('country').value;
   const channel = getToggleVal('channel-group') || 'online';
-  const isWeekend = getToggleVal('weekend-group') === 'weekend';
-  const specifiedPayments = getMultiToggleVals('payment-group'); // array, may be empty
+  const specifiedPayments = getMultiToggleVals('payment-group')
+    .filter(pm => isPaymentAvailableInCountry(pm, country)); // array, may be empty
 
   if (!amount || amount <= 0) {
     showError('請輸入有效的消費金額');
@@ -517,7 +569,7 @@ function calculate() {
     }
   }
 
-  const ctx = { amount, currency, country, channel, isWeekend, merchant, payments: specifiedPayments.length > 0 ? specifiedPayments : null };
+  const ctx = { amount, currency, country, channel, merchant, payments: specifiedPayments.length > 0 ? specifiedPayments : null };
   const amountTWD = currency === 'TWD' ? amount : amount * fxRate;
 
   // Calculate all cards

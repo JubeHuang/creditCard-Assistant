@@ -637,3 +637,6 @@
     }
 
   }
+
+/* Hidden country-specific payment buttons must not retain layout space. */
+#payment-group .toggle[hidden] { display: none; }

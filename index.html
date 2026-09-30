@@ -99,13 +99,6 @@
           <button class="toggle" data-val="offline" onclick="setToggle('channel-group', this)">實體</button>
         </div>
       </div>
-      <div class="field">
-        <label>是否假日／國定假日</label>
-        <div class="toggle-group" id="weekend-group">
-          <button class="toggle active" data-val="weekday" onclick="setToggle('weekend-group', this)">平日</button>
-          <button class="toggle" data-val="weekend" onclick="setToggle('weekend-group', this)">假日</button>
-        </div>
-      </div>
     </div>
 
     <div class="field" style="margin-bottom:14px">
@@ -115,6 +108,8 @@
         <button class="toggle" data-val="apple_pay" onclick="toggleMulti(this)">Apple Pay</button>
         <button class="toggle" data-val="physical_card" onclick="toggleMulti(this)">實體卡</button>
         <button class="toggle" data-val="taishin_pay" onclick="toggleMulti(this)">台新Pay</button>
+        <button class="toggle" data-val="taishin_pay_plus" onclick="toggleMulti(this)">台新Pay+</button>
+        <button class="toggle" data-val="fullpay" onclick="toggleMulti(this)">全盈+Pay</button>
         <button class="toggle" data-val="paypay" onclick="toggleMulti(this)">PayPay</button>
       </div>
     </div>
@@ -132,8 +127,10 @@
 
 </div>
 
-<!-- cards.js 必須在 app.js 之前載入 -->
+<!-- 資料載入順序：卡片權益 → 下半年權益覆寫 → 固定使用者資格 → 計算邏輯 -->
 <script src="cards.js"></script>
+<script src="cardBenefitOverrides.js"></script>
+<script src="userProfile.js"></script>
 <script src="app.js"></script>
 <script>
   if ('serviceWorker' in navigator) {

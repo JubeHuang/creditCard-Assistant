@@ -1,0 +1,59 @@
+{
+  "global_rules": {
+    "exclude_new_customer_offers": true,
+    "exclude_offer_types": [
+      "新戶限定",
+      "新卡友限定",
+      "首刷禮",
+      "首次申辦",
+      "首次綁定",
+      "首次使用限定",
+      "新客限定"
+    ],
+    "source_priority": "official_bank_only",
+    "review_embedded_images": true,
+    "review_rule": "更新權益時必須同時檢查官方頁面的可見文字、權益圖卡與圖片內文字；不得只依 HTML 可擷取文字判斷。"
+  },
+  "cards": [
+    {
+      "card_id": "sinopac_bibei_usd",
+      "card_name": "幣倍卡（美元）",
+      "source_url": "https://bank.sinopac.com/sinopacBT/personal/credit-card/introduction/bankcard/dual-currency-card.html#list0"
+    },
+    {
+      "card_id": "esun_kumamon_jpy",
+      "card_name": "熊本熊卡（日圓雙幣）",
+      "source_url": "https://www.esunbank.com/zh-tw/personal/credit-card/intro/bank-card/kumamon_card#2"
+    },
+    {
+      "card_id": "esun_ubear",
+      "card_name": "U Bear 卡",
+      "source_url": "https://www.esunbank.com/zh-tw/personal/credit-card/intro/bank-card/u-bear#2"
+    },
+    {
+      "card_id": "sinopac_dawho",
+      "card_name": "DAWHO 現金回饋卡",
+      "source_url": "https://bank.sinopac.com/sinopacBT/personal/credit-card/introduction/bankcard/DAWHO.html"
+    },
+    {
+      "card_id": "sinopac_sport",
+      "card_name": "SPORT 卡",
+      "source_url": "https://bank.sinopac.com/sinopacBT/personal/credit-card/introduction/bankcard/sportcard.html"
+    },
+    {
+      "card_id": "dbs_aov",
+      "card_name": "傳說對決聯名卡",
+      "source_url": "https://www.dbs.com.tw/personal-zh/cards/dbs-aov/index.html#Plan"
+    },
+    {
+      "card_id": "taishin_richart",
+      "card_name": "Richart 卡",
+      "source_url": "https://mkp.taishinbank.com.tw/TsCms/marketing/expose/WM_20251216135929999/index.html#section-2"
+    },
+    {
+      "card_id": "cathay_cube",
+      "card_name": "CUBE 卡",
+      "source_url": "https://www.cathay-cube.com.tw/cathaybk/personal/product/credit-card/cards/cube-list"
+    }
+  ]
+}
