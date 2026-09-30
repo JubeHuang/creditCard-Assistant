@@ -265,6 +265,10 @@ function calcRewardForCard(card, ctx, fxRate) {
   for (const label of new Set(finalRules.map(r => r.display_name).filter(Boolean))) {
     notes.push({ type: 'info', text: label });
   }
+  if (ctx.country === 'KR' && _allowedPayments?.includes('taishin_pay_plus') &&
+      ctx.merchant && merchantInGroup(ctx.merchant, card, 'taishin_pay_plus_kr')) {
+    notes.push({ type: 'info', text: '韓國台新Pay+合作店家；請確認門市櫃台支援，實際受理依現場標示為準。' });
+  }
   if (fxFee > 0) notes.push({ type: 'warning', text: `含海外手續費扣除 -${fxFee.toFixed(0)} TWD` });
   if (isForeign && paymentHasFeeWaiver) notes.push({ type: 'action', text: '本次支付方式免收 1.5% 國外交易服務費' });
   if (needsPlanSwitch) {

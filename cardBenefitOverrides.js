@@ -136,6 +136,19 @@
   card.merchant_groups = {
     ...card.merchant_groups,
 
+    // 韓國台新Pay+合作店家：依官方列表與使用者提供的店家圖卡。
+    // 此清單供搜尋；實際支付受理仍以門市櫃台標示為準，並非完整白名單。
+    taishin_pay_plus_kr: [
+      "GS25", "CU", "7-11", "emart24",
+      "Paris Baguette", "南浦雪濃湯 Nampo Seolleongtang", "London Bagel Museum",
+      "Tous les Jours", "Perment Bakeshop", "姊妹麵條 Sisters Noodle",
+      "COMPOSE COFFEE", "A TWOSOME PLACE", "PASCUCCI", "MEGA COFFEE",
+      "CAFE LAYERED", "TERAROSA", "Mammoth Coffee", "dal.komm COFFEE", "EDIYA COFFEE",
+      "UNIQLO", "DAISO", "LOTTE Super", "新世界免稅店 SHINSEGAE DUTY FREE",
+      "innisfree", "GS THE FRESH", "Hanaro Mart", "Galleria 百貨",
+      "Delight Dermatology", "COVERNAT", "加勒比海灣 Caribbean Bay", "愛寶樂園 Everland", "MUSINSA"
+    ],
+
     tian_tian_shua: [
       "萬家福", "樂家康", "大買家", "唐吉訶德", "LOPIA", "智生活",
       "臺鐵", "高鐵", "台灣大車隊", "LINEGO", "Yoxi", "Uber", "台灣Bolt",

@@ -137,3 +137,21 @@ test('spending limits use each bonus rate and its period, including shared caps'
   run('calculate()');
   assert.match(elements.results.innerHTML, /刷卡上限約 NT\$16,000/);
 });
+
+
+test('Korean Pay+ merchants are searchable and use the existing country/payment rule', () => {
+  const merchants = run("CARDS.find(c => c.card_id === 'taishin_richart').merchant_groups.taishin_pay_plus_kr");
+  assert.equal(merchants.length, 32);
+  for (const merchant of merchants) {
+    assert.equal(run(`Boolean(ALL_MERCHANTS[${JSON.stringify(merchant)}])`), true, merchant);
+  }
+  for (const [country, payment, eligible] of [['KR', 'taishin_pay_plus', true], ['TW', 'physical_card', false], ['KR', 'physical_card', false]]) {
+    const result = run(`calcRewardForCard(CARDS.find(c => c.card_id === 'taishin_richart'), {
+      amount: 1000, currency: 'TWD', country: '${country}', channel: 'offline',
+      merchant: 'GS25', payments: ['${payment}']
+    }, 1)`);
+    assert.equal(result.ruleDetails.some(d => d.rule.rule_id === 'richart_payzhe_taishinpayplus_jpkr_bonus_3_5pct'), eligible);
+    assert.equal(result.notes.some(n => n.text.includes('韓國台新Pay+合作店家')), eligible);
+    if (eligible) { assert.equal(result.netRewardTWD, 38); assert.equal(result.fxFee, 0); }
+  }
+});
