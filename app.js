@@ -78,6 +78,11 @@ function scopeMatches(scope, ctx, card) {
     const isForeign = ctx.country !== 'TW';
     if (scope.foreign !== isForeign) return false;
   }
+  // foreign currency (independent from purchase location)
+  if (scope.foreign_currency !== undefined) {
+    const isForeignCurrency = ctx.currency !== 'TWD';
+    if (scope.foreign_currency !== isForeignCurrency) return false;
+  }
   // channel
   if (scope.channel && scope.channel.length > 0) {
     if (!scope.channel.includes(ctx.channel)) return false;
@@ -210,13 +215,13 @@ function calcRewardForCard(card, ctx, fxRate) {
   const PLAN_NAMES = {
     tian_tian_shua: '天天刷', da_bi_shua: '大筆刷', hao_xiang_shua: '好饗刷',
     shu_qu_shua: '數趣刷', wan_lv_shua: '玩旅刷', pay_zhe_shua: 'Pay著刷',
-    weekend_shua: '假日刷', play_digital: '玩數位', le_savor: '樂饗購',
+    weekend_shua: '假日刷', chill_shua: 'Chill刷', play_digital: '玩數位', le_savor: '樂饗購',
     fun_travel: '趣旅行', selected: '集精選',
   };
 
   const notes = [];
   if (fxFee > 0) notes.push({ type: 'warning', text: `含海外手續費扣除 -${fxFee.toFixed(0)} TWD` });
-  if (isForeign && paymentHasFeeWaiver) notes.push({ type: 'action', text: '本次使用 PayPay，免收 1.5% 國外交易服務費' });
+  if (isForeign && paymentHasFeeWaiver) notes.push({ type: 'action', text: '本次支付方式免收 1.5% 國外交易服務費' });
   if (needsPlanSwitch) {
     // Collect all plan names from matched rules
     const planNames = new Set();
@@ -313,6 +318,8 @@ const PAY_NAMES = {
   apple_pay: 'Apple Pay',
   physical_card: '實體卡',
   taishin_pay: '台新Pay',
+  taishin_pay_plus: '台新Pay+',
+  fullpay: '全盈+Pay',
   paypay: 'PayPay',
 };
 
