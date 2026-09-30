@@ -39,6 +39,21 @@
       "card_id": "sinopac_sport",
       "card_name": "SPORT 卡",
       "source_url": "https://bank.sinopac.com/sinopacBT/personal/credit-card/introduction/bankcard/sportcard.html"
+    },
+    {
+      "card_id": "dbs_aov",
+      "card_name": "傳說對決聯名卡",
+      "source_url": "https://www.dbs.com.tw/personal-zh/cards/dbs-aov/index.html#Plan"
+    },
+    {
+      "card_id": "taishin_richart",
+      "card_name": "Richart 卡",
+      "source_url": "https://mkp.taishinbank.com.tw/TsCms/marketing/expose/WM_20251216135929999/index.html#section-2"
+    },
+    {
+      "card_id": "cathay_cube",
+      "card_name": "CUBE 卡",
+      "source_url": "https://www.cathay-cube.com.tw/cathaybk/personal/product/credit-card/cards/cube-list"
     }
   ]
 }
