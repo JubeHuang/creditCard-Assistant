@@ -47,6 +47,16 @@ const ALL_MERCHANTS = (() => {
   return map;
 })();
 
+// Keep the buttons and automatic recommendations on the same country policy.
+const PAYMENTS_BY_COUNTRY = {
+  TW: ['line_pay', 'apple_pay', 'physical_card', 'taishin_pay', 'fullpay'],
+  JP: ['line_pay', 'apple_pay', 'physical_card', 'taishin_pay_plus', 'paypay'],
+  KR: ['line_pay', 'apple_pay', 'physical_card', 'taishin_pay_plus'],
+};
+function isPaymentAvailableInCountry(pm, country) {
+  return (PAYMENTS_BY_COUNTRY[country] || ['apple_pay', 'physical_card']).includes(pm);
+}
+
 function isPaymentAllowed(pm, merchant, card) {
   if (!merchant) return true;
   const restrictions = card.merchant_payment_restrictions || {};
@@ -125,7 +135,7 @@ function scopeMatches(scope, ctx, card) {
 function calcRewardForCard(card, ctx, fxRate) {
   // Pre-filter payments by merchant restrictions
   const _allowedPayments = ctx.payments
-    ? ctx.payments.filter(pm => isPaymentAllowed(pm, ctx.merchant, card))
+    ? ctx.payments.filter(pm => isPaymentAvailableInCountry(pm, ctx.country) && isPaymentAllowed(pm, ctx.merchant, card))
     : null;
   if (ctx.payments && ctx.merchant && _allowedPayments.length === 0) {
     return {
@@ -279,7 +289,7 @@ function calcWithBestPayment(card, ctx, fxRate) {
     : ['physical_card'];
   // Filter by merchant payment restrictions
   const uniquePayments = [...new Set(supported)].filter(pm =>
-    isPaymentAllowed(pm, ctx.merchant, card)
+    isPaymentAvailableInCountry(pm, ctx.country) && isPaymentAllowed(pm, ctx.merchant, card)
   );
   if (ctx.merchant && uniquePayments.length === 0) {
     return {
@@ -303,7 +313,7 @@ function calcWithBestPayment(card, ctx, fxRate) {
     }
   }
   if (ctx.payments && ctx.payments.length > 0) {
-    const allowedSpecified = ctx.payments.filter(pm => isPaymentAllowed(pm, ctx.merchant, card));
+    const allowedSpecified = ctx.payments.filter(pm => isPaymentAvailableInCountry(pm, ctx.country) && isPaymentAllowed(pm, ctx.merchant, card));
     if (allowedSpecified.length > 0) {
       const result = calcRewardForCard(card, { ...ctx, payments: allowedSpecified }, fxRate);
       if (!best || result.netRewardTWD >= best.netRewardTWD) {
@@ -445,26 +455,19 @@ function toggleCardList() {
   toggle.classList.toggle('open');
 }
 
-// PayPay only available in Japan
-function updatePayPayAvailability() {
+function updatePaymentAvailability() {
   const country = document.getElementById('country').value;
-  const paypayBtn = document.querySelector('#payment-group .toggle[data-val="paypay"]');
-  if (!paypayBtn) return;
-  if (country !== 'JP') {
-    paypayBtn.classList.remove('active');
-    paypayBtn.disabled = true;
-    paypayBtn.style.opacity = '0.35';
-    paypayBtn.style.cursor = 'not-allowed';
-    paypayBtn.title = '僅限日本消費';
-  } else {
-    paypayBtn.disabled = false;
-    paypayBtn.style.opacity = '';
-    paypayBtn.style.cursor = '';
-    paypayBtn.title = '';
-  }
+  document.querySelectorAll('#payment-group .toggle').forEach(button => {
+    const available = isPaymentAvailableInCountry(button.dataset.val, country);
+    button.hidden = !available;
+    button.disabled = !available;
+    if (!available) button.classList.remove('active');
+  });
+  // A ranking calculated for the previous country is no longer applicable.
+  document.getElementById('results').innerHTML = '<div class="empty-state"><div class="empty-text">輸入消費情境後點擊計算<br>即可看到持有卡片的回饋排名</div></div>';
 }
-document.getElementById('country').addEventListener('change', updatePayPayAvailability);
-updatePayPayAvailability();
+document.getElementById('country').addEventListener('change', updatePaymentAvailability);
+updatePaymentAvailability();
 renderCardList();
 
 // Currency FX row
@@ -517,7 +520,8 @@ function calculate() {
   const merchant = document.getElementById('merchant').value.trim();
   const country = document.getElementById('country').value;
   const channel = getToggleVal('channel-group') || 'online';
-  const specifiedPayments = getMultiToggleVals('payment-group'); // array, may be empty
+  const specifiedPayments = getMultiToggleVals('payment-group')
+    .filter(pm => isPaymentAvailableInCountry(pm, country)); // array, may be empty
 
   if (!amount || amount <= 0) {
     showError('請輸入有效的消費金額');

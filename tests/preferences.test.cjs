@@ -13,6 +13,11 @@ Object.assign(elements.amount, { value: '1000' });
 elements.currency.value = 'TWD';
 elements.country.value = 'TW';
 elements.merchant.value = '海底撈';
+const paymentButtons = [...html.matchAll(/data-val="([^"]+)" onclick="toggleMulti/g)].map(([, val]) => {
+  const classes = new Set();
+  return { dataset: { val }, hidden: false, disabled: false,
+    classList: { add: c => classes.add(c), remove: c => classes.delete(c), contains: c => classes.has(c) } };
+});
 const context = vm.createContext({
   document: {
     getElementById: id => elements[id] || null,
@@ -20,7 +25,9 @@ const context = vm.createContext({
       assert.ok(!selector.includes('weekend-group'));
       return selector.includes('channel-group') ? { dataset: { val: 'online' } } : null;
     },
-    querySelectorAll: () => [], addEventListener() {},
+    querySelectorAll: selector => selector === '#payment-group .toggle' ? paymentButtons
+      : selector === '#payment-group .toggle.active' ? paymentButtons.filter(b => b.classList.contains('active')) : [],
+    addEventListener() {},
   },
   // Keep activity-label tests independent of the date the test is run.
   Date: class extends Date { constructor(...args) { super(...(args.length ? args : ['2026-09-30T00:00:00+08:00'])); } },
@@ -59,4 +66,47 @@ test('page initializes and calculates without a holiday input', () => {
   elements.merchant.value = '';
   run('calculate()');
   assert.match(elements.results.innerHTML, /一般消費/);
+});
+
+
+test('country changes show exactly the requested payments and clear hidden selections', () => {
+  const expected = {
+    TW: ['line_pay', 'apple_pay', 'physical_card', 'taishin_pay', 'fullpay'],
+    JP: ['line_pay', 'apple_pay', 'physical_card', 'taishin_pay_plus', 'paypay'],
+    KR: ['line_pay', 'apple_pay', 'physical_card', 'taishin_pay_plus'],
+  };
+  for (const country of ['TW', 'JP', 'KR', 'US', 'EU', 'TH', 'SG', 'OTHER', 'TW']) {
+    paymentButtons.forEach(b => b.classList.add('active'));
+    elements.country.value = country;
+    run('updatePaymentAvailability()');
+    const allowed = expected[country] || ['apple_pay', 'physical_card'];
+    assert.deepEqual(paymentButtons.filter(b => !b.hidden).map(b => b.dataset.val), allowed);
+    paymentButtons.filter(b => b.hidden).forEach(b => {
+      assert.equal(b.disabled, true);
+      assert.equal(b.classList.contains('active'), false);
+    });
+    assert.doesNotMatch(elements.results.innerHTML, /card-result|results-header/);
+    const results = run(`CARDS.map(card => calcWithBestPayment(card, {
+      amount: 1000, currency: 'TWD', country: '${country}', channel: 'offline', merchant: '', payments: null
+    }, 1))`);
+    for (const r of results) assert.ok(allowed.includes(r.suggestedPayment), r.suggestedPayment);
+  }
+  paymentButtons.forEach(b => b.classList.remove('active'));
+});
+
+test('new official merchants are searchable and receive the correct card bonus', () => {
+  for (const merchant of ['日本MITSUI', 'LaLaport', 'Montbell', 'Alpen', '人形町今半']) {
+    assert.equal(run(`Boolean(ALL_MERCHANTS[${JSON.stringify(merchant)}])`), true);
+    const result = run(`calcRewardForCard(CARDS.find(c => c.card_id === 'esun_kumamon_jpy'), {
+      amount: 1000, currency: 'JPY', country: 'JP', channel: 'offline',
+      merchant: ${JSON.stringify(merchant)}, payments: ['physical_card']
+    }, 1)`);
+    assert.equal(result.netRewardTWD, 70, merchant);
+    assert.ok(result.ruleDetails.some(d => d.rule.rule_id === 'kumamon_japan_specified_bonus_6pct_cap500'));
+  }
+  const sport = run(`calcRewardForCard(CARDS.find(c => c.card_id === 'sinopac_sport'), {
+    amount: 1000, currency: 'TWD', country: 'TW', channel: 'offline',
+    merchant: '喬山生機', payments: ['physical_card']
+  }, 1)`);
+  assert.equal(sport.netRewardTWD, 50);
 });
