@@ -10,7 +10,9 @@ const USER_PROFILE = {
   },
   "sinopac_sport": {
     "sport_task_always_met": true,
-    "task_completed": true
+    "task_completed": true,
+    "e_statement_enabled": true,
+    "autopay_enabled": true
   },
   "sinopac_dawho": {
     "dawho_level": "premium",
@@ -18,9 +20,14 @@ const USER_PROFILE = {
   },
   "esun_ubear": {
     "e_statement_enabled": true,
+    "autopay_enabled": true,
     "pxpay_treated_as_online": true
   },
-  "esun_kumamon_jpy": {},
+  "esun_kumamon_jpy": {
+    "e_statement_enabled": true,
+    "autopay_enabled": true,
+    "campaign_registered": true
+  },
   "dbs_eco": {
     "task_completed": true
   },
