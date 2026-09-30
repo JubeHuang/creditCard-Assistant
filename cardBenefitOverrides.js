@@ -198,7 +198,7 @@
       scope: {
         requires_plan_switch: true,
         plan_in: ["tian_tian_shua", "da_bi_shua", "hao_xiang_shua", "shu_qu_shua", "wan_lv_shua"],
-        payment_method_in: ["physical_card", "taishin_pay", "apple_pay", "google_wallet", "samsung_pay"],
+        payment_method_in: ["physical_card", "taishin_pay", "apple_pay"],
         merchant_group_in: ["tian_tian_shua", "da_bi_shua", "hao_xiang_shua", "shu_qu_shua", "wan_lv_shua"]
       },
       rate: 0.03,
@@ -292,8 +292,8 @@
         country: "TW",
         weekday: "weekend_or_holiday",
         payment_method_in: [
-          "physical_card", "taishin_pay", "apple_pay", "google_wallet",
-          "samsung_pay", "line_pay", "fullpay"
+          "physical_card", "taishin_pay", "apple_pay",
+          "line_pay", "fullpay"
         ],
         channel: ["online", "offline"]
       },
@@ -319,6 +319,7 @@
       requires: level2,
       exclusive_group: "richart_plan_bonus",
       valid_until: "2026-12-31",
+      display_name: "Chill刷指定通路加碼",
       description: "Chill刷指定通路加碼 +9.7%（與一般 0.3% 合計 10%；需切方案）"
     },
     {
@@ -335,6 +336,7 @@
       requires: level2,
       exclusive_group: "richart_plan_bonus",
       valid_until: "2026-12-31",
+      display_name: "Chill刷指定通路加碼",
       description: "Chill刷指定通路加碼 +4.7%（與一般 0.3% 合計 5%；需切方案）"
     },
     {
@@ -351,6 +353,7 @@
       requires: level2,
       exclusive_group: "richart_plan_bonus",
       valid_until: "2026-12-31",
+      display_name: "Chill刷指定通路加碼",
       description: "Chill刷指定通路加碼 +3.0%（與一般 0.3% 合計 3.3%；需切方案）"
     }
   ];
@@ -362,7 +365,7 @@
 
   card.payment_dictionary = {
     supported_default: [
-      "physical_card", "apple_pay", "google_wallet", "samsung_pay",
+      "physical_card", "apple_pay",
       "line_pay", "fullpay", "taishin_pay", "taishin_pay_plus"
     ]
   };

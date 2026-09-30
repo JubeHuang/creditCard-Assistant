@@ -286,8 +286,6 @@ const CARDS = [
         "scope": {
           "payment_method_in": [
             "apple_pay",
-            "google_wallet",
-            "samsung_pay",
             "garmin_pay"
           ]
         },
@@ -310,8 +308,6 @@ const CARDS = [
       "supported_default": [
         "physical_card",
         "apple_pay",
-        "google_wallet",
-        "samsung_pay",
         "garmin_pay"
       ]
     },
@@ -416,7 +412,6 @@ const CARDS = [
         "丁丁藥局",
         "新高橋藥局",
         "APP Store",
-        "Google Play",
         "Nintendo",
         "PlayStation",
         "Steam"
@@ -1145,7 +1140,6 @@ const CARDS = [
     "merchant_groups": {
       "dbs_aov_lifestyle_selected": [
         "App Store",
-        "Google Play",
         "Garena",
         "GASH",
         "MyCard",
@@ -1271,7 +1265,6 @@ const CARDS = [
           "payment_method_in": [
             "physical_card",
             "apple_pay",
-            "samsung_pay"
           ],
           "exclude_categories": "excluded_categories"
         },
@@ -1292,7 +1285,6 @@ const CARDS = [
       "supported_default": [
         "physical_card",
         "apple_pay",
-        "samsung_pay"
       ]
     },
     "merchant_payment_restrictions": {
@@ -1676,8 +1668,6 @@ const CARDS = [
             "physical_card",
             "taishin_pay",
             "apple_pay",
-            "google_wallet",
-            "samsung_pay"
           ],
           "merchant_group_in": [
             "tian_tian_shua",
@@ -1708,8 +1698,6 @@ const CARDS = [
             "physical_card",
             "taishin_pay",
             "apple_pay",
-            "google_wallet",
-            "samsung_pay",
             "line_pay",
             "fullpay"
           ],
@@ -1737,8 +1725,6 @@ const CARDS = [
       "supported_default": [
         "physical_card",
         "apple_pay",
-        "google_wallet",
-        "samsung_pay",
         "line_pay",
         "taishin_pay",
         "fullpay",
@@ -1849,7 +1835,6 @@ const CARDS = [
         "Gamma",
         "Gemini",
         "Apple 媒體服務",
-        "Google Play",
         "Disney+",
         "Netflix",
         "Spotify",
@@ -1984,8 +1969,6 @@ const CARDS = [
       "supported_default": [
         "physical_card",
         "apple_pay",
-        "google_wallet",
-        "samsung_pay",
         "line_pay"
       ]
     },

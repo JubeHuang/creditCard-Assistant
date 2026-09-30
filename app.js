@@ -116,7 +116,8 @@ function scopeMatches(scope, ctx, card) {
   // (this is handled by the merchant_group_in + payment_method_in checks above, so just pass)
   // weekday
   if (scope.weekday === 'weekend_or_holiday') {
-    if (!ctx.isWeekend) return false;
+    // No purchase-date input: do not assume eligibility for holiday-only bonuses.
+    return false;
   }
   return true;
 }
@@ -169,7 +170,10 @@ function calcRewardForCard(card, ctx, fxRate) {
 
   // Pick best from each exclusive group
   const chosenExclusive = Object.values(exclusiveGroups).map(rules =>
-    rules.sort((a, b) => b.rate - a.rate)[0]
+    rules.sort((a, b) => b.rate - a.rate ||
+      // Prefer Chill's specific merchant label when another plan has the same rate.
+      Number(b.scope?.plan === 'chill_shua') - Number(a.scope?.plan === 'chill_shua')
+    )[0]
   );
 
   const allChosen = [...nonExclusiveRules, ...chosenExclusive];
@@ -220,6 +224,9 @@ function calcRewardForCard(card, ctx, fxRate) {
   };
 
   const notes = [];
+  for (const label of new Set(finalRules.map(r => r.display_name).filter(Boolean))) {
+    notes.push({ type: 'info', text: label });
+  }
   if (fxFee > 0) notes.push({ type: 'warning', text: `含海外手續費扣除 -${fxFee.toFixed(0)} TWD` });
   if (isForeign && paymentHasFeeWaiver) notes.push({ type: 'action', text: '本次支付方式免收 1.5% 國外交易服務費' });
   if (needsPlanSwitch) {
@@ -407,10 +414,13 @@ function renderCardList() {
     card.reward_rules.filter(r => r.valid_until && r.valid_until !== card.promo_until).forEach(r => {
       const expiry = new Date(r.valid_until);
       const daysLeft = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
-      if (daysLeft >= 0) promoDates.push({ date: r.valid_until, daysLeft, label: r.description?.split('（')[0] || '限時優惠' });
+      if (daysLeft >= 0) promoDates.push({ date: r.valid_until, daysLeft, label: r.display_name || r.description?.split('（')[0] || '限時優惠' });
     });
 
-    const promos = promoDates.map(({ date, daysLeft, label }) => {
+    const uniquePromoDates = promoDates.filter((promo, index, all) =>
+      all.findIndex(other => other.date === promo.date && other.label === promo.label) === index
+    );
+    const promos = uniquePromoDates.map(({ date, daysLeft, label }) => {
       const dateStr = date.slice(5).replace('-', '/');
       const text = daysLeft <= 30
         ? `⚠ ${label}剩 ${daysLeft} 天（至 ${dateStr}）`
@@ -507,7 +517,6 @@ function calculate() {
   const merchant = document.getElementById('merchant').value.trim();
   const country = document.getElementById('country').value;
   const channel = getToggleVal('channel-group') || 'online';
-  const isWeekend = getToggleVal('weekend-group') === 'weekend';
   const specifiedPayments = getMultiToggleVals('payment-group'); // array, may be empty
 
   if (!amount || amount <= 0) {
@@ -524,7 +533,7 @@ function calculate() {
     }
   }
 
-  const ctx = { amount, currency, country, channel, isWeekend, merchant, payments: specifiedPayments.length > 0 ? specifiedPayments : null };
+  const ctx = { amount, currency, country, channel, merchant, payments: specifiedPayments.length > 0 ? specifiedPayments : null };
   const amountTWD = currency === 'TWD' ? amount : amount * fxRate;
 
   // Calculate all cards
