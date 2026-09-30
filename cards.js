@@ -4,7 +4,7 @@
 const CARDS = [
   {
     "card_id": "sinopac_bibei_usd",
-    "promo_until": "2026-06-30",
+    "promo_until": "2026-12-31",
     "bank": "永豐銀行",
     "card_name": "幣倍卡（美元）",
     "card_network": "Mastercard",
@@ -1129,7 +1129,7 @@ const CARDS = [
   },
   {
     "card_id": "dbs_aov",
-    "promo_until": "2026-06-30",
+    "promo_until": "2026-12-31",
     "bank": "星展銀行",
     "card_name": "傳說對決聯名卡",
     "card_network": "Mastercard",
@@ -1152,8 +1152,7 @@ const CARDS = [
         "Nintendo",
         "PlayStation",
         "Steam",
-        "Acer",
-        "ASUS",
+        "巴哈姆特",
         "Logitech",
         "NOVA",
         "三創生活園區",
@@ -1161,29 +1160,33 @@ const CARDS = [
         "KKTIX",
         "年代售票",
         "拓元售票",
+        "Animate",
+        "野獸國",
+        "POPMART",
+        "鼎美玩具",
+        "KHTOY",
+        "TOYSNAP",
+        "東海模型",
         "YouTube Premium",
-        "Apple TV",
         "Netflix",
         "Disney+",
-        "Spotify",
         "Twitch",
+        "TikTok",
         "愛奇藝",
         "Catchplay",
-        "KKBOX",
         "KKTV",
-        "LINE TV",
         "LiTV",
-        "愛爾達電視",
+        "Spotify",
+        "KKBOX",
+        "蝦皮",
+        "淘寶",
         "Uber Eats",
         "foodpanda",
         "麥當勞",
         "肯德基",
         "摩斯漢堡",
-        "21 世紀風味館",
-        "美墨炸雞",
         "拿坡里",
-        "Pizza Hut",
-        "蝦皮"
+        "Pizza Hut"
       ]
     },
     "excluded_categories": [
@@ -1203,68 +1206,93 @@ const CARDS = [
     ],
     "reward_rules": [
       {
-        "rule_id": "aov_domestic_base_1_2pct_autopay",
+        "rule_id": "aov_domestic_base_1pct_autopay",
         "scope": {
           "country": "TW",
           "exclude_categories": "excluded_categories"
         },
-        "rate": 0.012,
+        "rate": 0.01,
         "cap": null,
+        "requires": {
+          "autopay_enabled": true
+        },
         "stackable": true,
         "priority": 1,
-        "description": "國內一般消費 1.2%（Autopay）"
+        "description": "國內一般消費 1%（無上限；需指定星展帳戶自動扣繳）"
       },
       {
-        "rule_id": "aov_foreign_base_2_5pct_autopay",
+        "rule_id": "aov_foreign_base_1pct_autopay",
         "scope": {
           "foreign": true,
           "exclude_categories": "excluded_categories"
         },
-        "rate": 0.025,
+        "rate": 0.01,
         "cap": null,
+        "requires": {
+          "autopay_enabled": true
+        },
         "stackable": true,
         "priority": 1,
-        "description": "海外一般消費 2.5%（Autopay）"
+        "description": "國外一般消費 1%（無上限；需指定星展帳戶自動扣繳）"
       },
       {
-        "rule_id": "aov_lifestyle_selected_bonus_8_8pct_domestic_cap1000",
+        "rule_id": "aov_lifestyle_selected_bonus_9pct_cap500",
         "scope": {
           "country": "TW",
           "merchant_group": "dbs_aov_lifestyle_selected",
           "exclude_categories": "excluded_categories"
         },
-        "rate": 0.088,
+        "rate": 0.09,
         "cap": {
           "period": "calendar_month",
-          "max_reward_twd": 1000
+          "max_reward_twd": 500
+        },
+        "requires": {
+          "autopay_enabled": true
         },
         "stackable": true,
         "priority": 2,
-        "description": "生活玩家精選 +8.8%（上限 1,000）",
-        "exclusive_group": "aov_domestic_bonus_8_8"
+        "description": "生活玩家精選通路加碼 +9%（與基本 1% 疊加，最高 10%；每月上限 500）"
       },
       {
-        "rule_id": "aov_linepay_bonus_8_8pct_domestic_cap1000",
+        "rule_id": "aov_overseas_offline_bonus_4pct_cap500",
         "scope": {
-          "country": "TW",
-          "payment_method": "line_pay",
+          "country_in": [
+            "JP",
+            "KR",
+            "TH",
+            "SG",
+            "US",
+            "EU"
+          ],
+          "channel": [
+            "offline"
+          ],
+          "payment_method_in": [
+            "physical_card",
+            "apple_pay",
+            "samsung_pay"
+          ],
           "exclude_categories": "excluded_categories"
         },
-        "rate": 0.088,
+        "rate": 0.04,
         "cap": {
           "period": "calendar_month",
-          "max_reward_twd": 1000
+          "max_reward_twd": 500
+        },
+        "requires": {
+          "autopay_enabled": true
         },
         "stackable": true,
         "priority": 2,
-        "exclusive_group": "aov_domestic_bonus_8_8",
-        "description": "LINE Pay 加碼 +8.8%（上限 1,000）"
+        "description": "日韓泰／新加坡／美洲／歐洲實體消費加碼 +4%（與基本 1% 疊加，最高 5%；每月上限 500）"
       }
     ],
     "payment_dictionary": {
       "supported_default": [
         "physical_card",
-        "line_pay"
+        "apple_pay",
+        "samsung_pay"
       ]
     },
     "merchant_payment_restrictions": {
@@ -1348,7 +1376,7 @@ const CARDS = [
   },
   {
     "card_id": "taishin_richart",
-    "promo_until": "2026-06-30",
+    "promo_until": "2027-03-31",
     "bank": "台新銀行",
     "card_name": "Richart 卡",
     "card_network": "Mastercard",
@@ -1388,7 +1416,8 @@ const CARDS = [
         "大樹藥局",
         "丁丁藥局",
         "佑全保健藥妝",
-        "健康人生藥局"
+        "健康人生藥局",
+        "智生活"
       ],
       "da_bi_shua": [
         "新光三越(含skm pay)",
@@ -1576,7 +1605,6 @@ const CARDS = [
       {
         "rule_id": "richart_base_0_3pct",
         "scope": {
-          "country": "TW",
           "channel": [
             "online",
             "offline"
@@ -1589,19 +1617,16 @@ const CARDS = [
         "description": "一般消費 0.3%（無上限）"
       },
       {
-        "rule_id": "richart_payzhe_taishinpay_3_5pct",
+        "rule_id": "richart_payzhe_taishinpay_bonus_3_5pct",
         "scope": {
           "plan": "pay_zhe_shua",
           "payment_method": "taishin_pay",
           "channel": [
             "online",
             "offline"
-          ],
-          "merchant_group_in": [
-            "pay_zhe_shua_taishinpay_3_8_merchants"
           ]
         },
-        "rate": 0.032,
+        "rate": 0.035,
         "cap": null,
         "stackable": true,
         "priority": 2,
@@ -1609,14 +1634,17 @@ const CARDS = [
           "user_level": "level2",
           "autopay_enabled": true
         },
-        "description": "Pay著刷：台新Pay +3.2%（合計 3.5%；需切方案）",
+        "description": "Pay著刷：台新Pay／台新Pay+ 加碼 +3.5%（與一般 0.3% 合計 3.8%；需切方案）",
         "exclusive_group": "richart_plan_bonus"
       },
       {
-        "rule_id": "richart_payzhe_linepay_2_3pct",
+        "rule_id": "richart_payzhe_linepay_bonus_2pct",
         "scope": {
           "plan": "pay_zhe_shua",
-          "payment_method": "line_pay",
+          "payment_method_in": [
+            "line_pay",
+            "fullpay"
+          ],
           "channel": [
             "online",
             "offline"
@@ -1630,11 +1658,11 @@ const CARDS = [
           "user_level": "level2",
           "autopay_enabled": true
         },
-        "description": "Pay著刷：LINE Pay +2.0%（合計 2.3%；需切方案）",
+        "description": "Pay著刷：LINE Pay／全盈+Pay 加碼 +2.0%（與一般 0.3% 合計 2.3%；需切方案）",
         "exclusive_group": "richart_plan_bonus"
       },
       {
-        "rule_id": "richart_5plans_bonus_3_3pct",
+        "rule_id": "richart_5plans_bonus_3pct",
         "scope": {
           "requires_plan_switch": true,
           "plan_in": [
@@ -1667,11 +1695,11 @@ const CARDS = [
           "user_level": "level2",
           "autopay_enabled": true
         },
-        "description": "五大方案 +3.0%（合計 3.3%；需切方案）",
+        "description": "天天刷／大筆刷／好饗刷／數趣刷／玩旅刷加碼 +3.0%（與一般 0.3% 合計 3.3%；需切方案）",
         "exclusive_group": "richart_plan_bonus"
       },
       {
-        "rule_id": "richart_weekend_shua_2pct",
+        "rule_id": "richart_weekend_shua_bonus_1_7pct",
         "scope": {
           "plan": "weekend_shua",
           "country": "TW",
@@ -1682,7 +1710,8 @@ const CARDS = [
             "apple_pay",
             "google_wallet",
             "samsung_pay",
-            "line_pay"
+            "line_pay",
+            "fullpay"
           ],
           "channel": [
             "online",
@@ -1697,26 +1726,7 @@ const CARDS = [
           "user_level": "level2",
           "autopay_enabled": true
         },
-        "description": "假日刷 +1.7%（合計 2.0%；需切方案）",
-        "exclusive_group": "richart_plan_bonus"
-      },
-      {
-        "rule_id": "richart_payzhe_paypay_japan_3_8pct",
-        "scope": {
-          "plan": "pay_zhe_shua",
-          "requires_plan_switch": true,
-          "payment_method": "paypay",
-          "country": "JP"
-        },
-        "rate": 0.038,
-        "cap": null,
-        "stackable": true,
-        "priority": 2,
-        "requires": {
-          "user_level": "level2",
-          "autopay_enabled": true
-        },
-        "description": "Pay著刷：PayPay 日本 3.8%（免手續費；需切方案）",
+        "description": "假日刷加碼 +1.7%（與一般 0.3% 合計 2.0%；需切方案）",
         "exclusive_group": "richart_plan_bonus"
       }
     ],
@@ -1731,6 +1741,7 @@ const CARDS = [
         "samsung_pay",
         "line_pay",
         "taishin_pay",
+        "fullpay",
         "paypay"
       ]
     },
@@ -1815,7 +1826,7 @@ const CARDS = [
   },
   {
     "card_id": "cathay_cube",
-    "promo_until": "2026-06-30",
+    "promo_until": "2026-12-31",
     "bank": "國泰世華銀行",
     "card_name": "CUBE 卡",
     "card_network": "Mastercard",
@@ -1832,9 +1843,11 @@ const CARDS = [
         "Notion",
         "Canva",
         "Claude",
+        "Cursor",
         "Speak",
         "Duolingo",
         "Gamma",
+        "Gemini",
         "Apple 媒體服務",
         "Google Play",
         "Disney+",
@@ -1881,11 +1894,22 @@ const CARDS = [
         "Trip.com",
         "Airbnb",
         "Hotels.com",
-        "Expedia"
+        "Expedia",
+        "海外實體消費",
+        "東京迪士尼樂園",
+        "東京華納兄弟哈利波特影城",
+        "大阪環球影城",
+        "yoxi",
+        "台灣大車隊",
+        "iRent",
+        "和運租車",
+        "格上租車"
       ],
       "selected": [
         "IKEA 宜家家居",
-        "家樂福",
+        "萬家福",
+        "樂家康",
+        "LOPIA台灣",
         "全聯福利中心",
         "7-ELEVEN",
         "全家便利商店",
@@ -1937,7 +1961,7 @@ const CARDS = [
         "requires": {
           "user_level": "level2"
         },
-        "description": "玩數位／樂饗購／趣旅行 +2.7%（合計 3%；需切方案）"
+        "description": "玩數位／樂饗購／趣旅行加碼 +2.7%（與一般 0.3% 合計 3%；需切方案）"
       },
       {
         "rule_id": "cube_selected_2pct",
@@ -1950,7 +1974,10 @@ const CARDS = [
         "cap": null,
         "stackable": true,
         "priority": 2,
-        "description": "集精選 +1.7%（合計 2%；需切方案）"
+        "requires": {
+          "user_level": "level2"
+        },
+        "description": "集精選加碼 +1.7%（與一般 0.3% 合計 2%；需切方案）"
       }
     ],
     "payment_dictionary": {
