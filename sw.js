@@ -1,4 +1,4 @@
-const CACHE = 'creditcard-richart-aov-test-v3';
+const CACHE = 'creditcard-richart-aov-test-v4';
 const ASSETS = ['.', 'index.html', 'style.css', 'app.js', 'cards.js', 'cardBenefitOverrides.js', 'userProfile.js', 'manifest.json'];
 
 self.addEventListener('install', e => {

@@ -110,3 +110,30 @@ test('new official merchants are searchable and receive the correct card bonus',
   }, 1)`);
   assert.equal(sport.netRewardTWD, 50);
 });
+
+
+test('spending limits use each bonus rate and its period, including shared caps', () => {
+  for (const [id, merchant, payment, expected] of [
+    ['sinopac_dawho', '', 'physical_card', '每帳單週期刷卡上限約 NT$16,000'],
+    ['sinopac_sport', '', 'apple_pay', '每月刷卡上限約 NT$5,000'],
+    ['sinopac_sport', '', 'apple_pay', '每月刷卡上限約 NT$10,000'],
+    ['esun_ubear', 'Netflix', 'physical_card', '每帳單週期刷卡上限約 NT$1,000'],
+    ['sinopac_bibei_usd', 'Amazon', 'physical_card', '每帳單週期刷卡上限約 NT$20,000'],
+  ]) {
+    const result = run(`calcRewardForCard(CARDS.find(c => c.card_id === '${id}'), {
+      amount: 1000, currency: 'TWD', country: 'TW', channel: 'online',
+      merchant: ${JSON.stringify(merchant)}, payments: ['${payment}']
+    }, 1)`);
+    assert.ok(result.notes.some(n => n.text.includes(expected)), expected);
+  }
+  const shared = run(`getSpendingLimitNotes([
+    {rule: {rule_id: 'a', rate: 0.01, shared_cap_group: 'same', cap: {max_reward_twd: 100, period: 'quarter'}}},
+    {rule: {rule_id: 'b', rate: 0.03, shared_cap_group: 'same', cap: {max_reward_twd: 100, period: 'quarter'}}}
+  ])`);
+  assert.match(shared[0].text, /每季刷卡上限約 NT\$2,500/);
+  assert.match(shared[0].text, /共用額度/);
+  elements.country.value = 'TW';
+  elements.merchant.value = '';
+  run('calculate()');
+  assert.match(elements.results.innerHTML, /刷卡上限約 NT\$16,000/);
+});

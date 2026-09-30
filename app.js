@@ -132,6 +132,34 @@ function scopeMatches(scope, ctx, card) {
   return true;
 }
 
+// Spending thresholds use the bonus rate, not the combined or net reward rate.
+function getSpendingLimitNotes(ruleDetails) {
+  const periods = { statement_cycle: '每帳單週期', calendar_month: '每月', quarter: '每季' };
+  const groups = new Map();
+  for (const { rule } of ruleDetails) {
+    if (!rule.cap || !(rule.rate > 0)) continue;
+    const key = rule.shared_cap_group || rule.rule_id;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(rule);
+  }
+  if (!groups.size) return ruleDetails.length ? [{ type: 'info', text: '本次適用回饋：無刷卡金額上限' }] : [];
+  const notes = [...groups.values()].map(rules => {
+    const first = rules[0];
+    const rate = rules.reduce((sum, rule) => sum + rule.rate, 0);
+    const limit = first.cap.max_reward_twd / rate;
+    const format = value => value.toLocaleString('zh-TW', { maximumFractionDigits: 2 });
+    const labels = [...new Set(rules.map(rule => rule.display_name || (rule.description || '加碼回饋').split('（')[0]))].join('／');
+    const period = periods[first.cap.period] || '活動期間';
+    const shared = first.shared_cap_group ? '；與其他適用通路共用額度' : '';
+    return { type: 'info', text: `${labels}：${period}刷卡上限約 NT$${format(limit)}（回饋上限 NT$${format(first.cap.max_reward_twd)}${shared}）` };
+  });
+  notes.push({ type: 'info', text: '刷卡上限為完整回饋額度換算，外幣以折合台幣計；未扣除本期已使用額度。' });
+  if (ruleDetails.some(({ rule }) => !rule.cap)) {
+    notes.push({ type: 'info', text: '有上限的加碼用完後，無上限的回饋仍繼續計算。' });
+  }
+  return notes;
+}
+
 function calcRewardForCard(card, ctx, fxRate) {
   // Pre-filter payments by merchant restrictions
   const _allowedPayments = ctx.payments
@@ -233,7 +261,7 @@ function calcRewardForCard(card, ctx, fxRate) {
     fun_travel: '趣旅行', selected: '集精選',
   };
 
-  const notes = [];
+  const notes = getSpendingLimitNotes(ruleDetails);
   for (const label of new Set(finalRules.map(r => r.display_name).filter(Boolean))) {
     notes.push({ type: 'info', text: label });
   }
