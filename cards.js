@@ -121,7 +121,9 @@ const CARDS = [
         "rule_id": "bibei_foreign_offline_4pct_cap300",
         "scope": {
           "foreign": true,
-          "channel": ["offline"]
+          "channel": [
+            "offline"
+          ]
         },
         "rate": 0.04,
         "cap": {
@@ -221,7 +223,7 @@ const CARDS = [
   },
   {
     "card_id": "sinopac_sport",
-    "promo_until": "2026-06-30",
+    "promo_until": "2026-12-31",
     "bank": "永豐銀行",
     "card_name": "SPORT 卡",
     "card_network": "Mastercard",
@@ -236,31 +238,81 @@ const CARDS = [
         "rule_id": "sport_base_1pct",
         "scope": {},
         "rate": 0.01,
+        "cap": null,
+        "requires": {
+          "e_statement_enabled": true
+        },
         "stackable": true,
         "priority": 1,
-        "description": "一般消費 1%（無上限）"
+        "description": "一般消費 1%（含電子／行動帳單加碼；無上限）"
       },
       {
-        "rule_id": "sport_mobile_pay_4pct_cap300",
-        "scope": {
-          "payment_method_in": [
-            "apple_pay"
-          ]
+        "rule_id": "sport_activity_bonus_1pct_cap50",
+        "scope": {},
+        "rate": 0.01,
+        "cap": {
+          "period": "calendar_month",
+          "max_reward_twd": 50
         },
-        "rate": 0.04,
+        "requires": {
+          "sport_task_always_met": true,
+          "autopay_enabled": true
+        },
+        "stackable": true,
+        "priority": 2,
+        "description": "運動獎勵 +1%（每月上限 50；需達運動門檻並設定自扣）"
+      },
+      {
+        "rule_id": "sport_selected_bonus_3pct_cap300",
+        "scope": {
+          "merchant_group": "sport_selected"
+        },
+        "rate": 0.03,
         "cap": {
           "period": "calendar_month",
           "max_reward_twd": 300
         },
+        "requires": {
+          "sport_task_always_met": true,
+          "autopay_enabled": true
+        },
         "stackable": true,
-        "priority": 2,
-        "description": "Apple Pay 加碼 +4%（與基本 1% 疊加，最高 5%；每月上限 300）"
+        "priority": 3,
+        "exclusive_group": "sport_selected_bonus",
+        "description": "指定通路加碼 +3%（與基本／運動獎勵疊加，合計最高 5%；每月上限 300）"
+      },
+      {
+        "rule_id": "sport_mobile_pay_bonus_3pct_cap300",
+        "scope": {
+          "payment_method_in": [
+            "apple_pay",
+            "google_wallet",
+            "samsung_pay",
+            "garmin_pay"
+          ]
+        },
+        "rate": 0.03,
+        "cap": {
+          "period": "calendar_month",
+          "max_reward_twd": 300
+        },
+        "requires": {
+          "sport_task_always_met": true,
+          "autopay_enabled": true
+        },
+        "stackable": true,
+        "priority": 3,
+        "exclusive_group": "sport_selected_bonus",
+        "description": "指定行動支付加碼 +3%（與基本／運動獎勵疊加，合計最高 5%；與指定通路共用每月上限 300）"
       }
     ],
     "payment_dictionary": {
       "supported_default": [
         "physical_card",
-        "apple_pay"
+        "apple_pay",
+        "google_wallet",
+        "samsung_pay",
+        "garmin_pay"
       ]
     },
     "merchant_payment_restrictions": {
@@ -340,11 +392,40 @@ const CARDS = [
           "台新銀行"
         ]
       }
+    },
+    "merchant_groups": {
+      "sport_selected": [
+        "World Gym",
+        "健身工廠",
+        "Curves",
+        "喬山健康科技",
+        "Welltivity數位大健康生活平台",
+        "台北市運動中心",
+        "新北市運動中心",
+        "Nuli女力APP",
+        "摩曼頓",
+        "Anytime Fitness",
+        "超核心健身中心",
+        "DAZN",
+        "屈臣氏",
+        "康是美",
+        "寶雅",
+        "好心肝健檢中心",
+        "杏一藥局",
+        "大樹藥局",
+        "丁丁藥局",
+        "新高橋藥局",
+        "APP Store",
+        "Google Play",
+        "Nintendo",
+        "PlayStation",
+        "Steam"
+      ]
     }
   },
   {
     "card_id": "sinopac_dawho",
-    "promo_until": "2026-06-30",
+    "promo_until": "2026-12-31",
     "bank": "永豐銀行",
     "card_name": "DAWHO 現金回饋卡",
     "card_network": "Mastercard",
@@ -366,9 +447,10 @@ const CARDS = [
           "country": "TW"
         },
         "rate": 0.01,
+        "cap": null,
         "stackable": true,
         "priority": 1,
-        "description": "國內一般消費 1%（無上限；可與任務加碼疊加）"
+        "description": "國內一般消費 1%（無上限）"
       },
       {
         "rule_id": "dawho_foreign_2pct",
@@ -376,22 +458,27 @@ const CARDS = [
           "foreign": true
         },
         "rate": 0.02,
+        "cap": null,
         "stackable": true,
         "priority": 1,
-        "description": "海外一般消費 2%（無上限；可與任務加碼疊加）"
+        "description": "國外一般消費 2%（無上限）"
       },
       {
         "rule_id": "dawho_task_2_5pct_cap400",
         "scope": {},
         "rate": 0.025,
         "cap": {
-          "period": "calendar_month",
+          "period": "statement_cycle",
           "max_reward_twd": 400,
           "cap_applies_to": "this_rule_only"
         },
+        "requires": {
+          "dawho_level": "premium",
+          "task_completed": true
+        },
         "stackable": true,
         "priority": 2,
-        "description": "任務加碼 +2.5%（國內合計 3.5%、海外合計 4.5%；每月加碼上限 400）"
+        "description": "大戶等級完成指定任務加碼 +2.5%（國內合計 3.5%、國外合計 4.5%；每月帳單週期上限 400）"
       },
       {
         "rule_id": "dawho_easycard_3pct_cap100",
@@ -400,12 +487,16 @@ const CARDS = [
         },
         "rate": 0.03,
         "cap": {
-          "period": "calendar_month",
+          "period": "statement_cycle",
           "max_reward_twd": 100
+        },
+        "requires": {
+          "dawho_level": "premium",
+          "task_completed": true
         },
         "stackable": false,
         "priority": 10,
-        "description": "悠遊卡自動加值 3%（每月上限 100；通常不與一般回饋疊加）"
+        "description": "悠遊卡自動加值 3%（每月帳單週期上限 100；不含一般消費及任務加碼回饋）"
       }
     ],
     "payment_dictionary": {
@@ -494,7 +585,7 @@ const CARDS = [
   },
   {
     "card_id": "esun_ubear",
-    "promo_until": "2026-08-31",
+    "promo_until": "2027-02-28",
     "bank": "玉山銀行",
     "card_name": "U Bear 卡",
     "card_network": "Mastercard",
@@ -511,11 +602,16 @@ const CARDS = [
         "街口支付",
         "LINE Pay",
         "momo",
-        "蝦皮"
+        "蝦皮",
+        "淘寶",
+        "線上訂房",
+        "高鐵線上購票"
       ],
       "ubear_streaming": [
         "Netflix",
-        "Disney+",
+        "ChatGPT",
+        "Gemini",
+        "Steam",
         "Nintendo",
         "PlayStation"
       ]
@@ -524,23 +620,58 @@ const CARDS = [
       {
         "rule_id": "ubear_base_1pct",
         "scope": {},
-        "rate": 0.01
+        "rate": 0.01,
+        "cap": null,
+        "requires": {
+          "e_statement_enabled": true,
+          "autopay_enabled": true
+        },
+        "stackable": true,
+        "priority": 1,
+        "description": "國內外一般消費 1%（無上限；需帳單e化＋玉山臺幣帳戶自動扣繳）"
       },
       {
-        "rule_id": "ubear_online_2pct_cap150",
-        "description": "線上指定通路 2% 回饋（上限 150 TWD／期）",
+        "rule_id": "ubear_online_bonus_2pct_cap150",
         "scope": {
-          "merchant_group": "ubear_online"
+          "channel": [
+            "online"
+          ]
         },
         "rate": 0.02,
         "cap": {
           "period": "statement_cycle",
           "max_reward_twd": 150
-        }
+        },
+        "requires": {
+          "e_statement_enabled": true
+        },
+        "stackable": true,
+        "priority": 2,
+        "exclusive_group": "ubear_online_bonus",
+        "description": "網路消費加碼 +2%（與基本 1% 疊加，合計最高 3%；每期上限 150）"
+      },
+      {
+        "rule_id": "ubear_mobile_pay_bonus_2pct_cap150",
+        "scope": {
+          "payment_method_in": [
+            "line_pay"
+          ]
+        },
+        "rate": 0.02,
+        "cap": {
+          "period": "statement_cycle",
+          "max_reward_twd": 150
+        },
+        "requires": {
+          "e_statement_enabled": true
+        },
+        "stackable": true,
+        "priority": 2,
+        "exclusive_group": "ubear_online_bonus",
+        "description": "指定行動支付加碼 +2%（與基本 1% 疊加，合計最高 3%；與網路消費共用每期上限 150）"
       },
       {
         "rule_id": "ubear_streaming_10pct_cap100",
-        "description": "串流媒體 10% 回饋（上限 100 TWD／期）",
         "scope": {
           "merchant_group": "ubear_streaming"
         },
@@ -548,7 +679,10 @@ const CARDS = [
         "cap": {
           "period": "statement_cycle",
           "max_reward_twd": 100
-        }
+        },
+        "stackable": false,
+        "priority": 10,
+        "description": "指定數位訂閱平台 10%（每期上限 100；不另累計一般消費與網路消費回饋）"
       }
     ],
     "payment_dictionary": {
@@ -637,7 +771,7 @@ const CARDS = [
   },
   {
     "card_id": "esun_kumamon_jpy",
-    "promo_until": "2026-06-30",
+    "promo_until": "2026-12-31",
     "bank": "玉山銀行",
     "card_name": "熊本熊卡（日圓雙幣）",
     "card_network": "JCB",
@@ -682,20 +816,45 @@ const CARDS = [
         "日本航空",
         "樂天旅遊",
         "東橫INN",
-        "星野集團"
+        "星野集團",
+        "TOYOTA Rent a Car",
+        "Times Car Rental",
+        "NIPPON RENT-A-CAR",
+        "OTS租車",
+        "ORIX租車",
+        "Budget租車",
+        "Prince Hotel"
       ]
     },
     "reward_rules": [
+      {
+        "rule_id": "kumamon_domestic_0_5pct",
+        "scope": {
+          "country": "TW"
+        },
+        "rate": 0.005,
+        "cap": null,
+        "requires": {
+          "e_statement_enabled": true,
+          "autopay_enabled": true
+        },
+        "stackable": true,
+        "priority": 1,
+        "description": "國內一般消費 0.5%（無上限；需帳單e化＋玉山帳戶自動扣繳）"
+      },
       {
         "rule_id": "kumamon_japan_2_5pct",
         "scope": {
           "country": "JP"
         },
-        "rate": 0.025
+        "rate": 0.025,
+        "cap": null,
+        "stackable": true,
+        "priority": 1,
+        "description": "日本一般消費 2.5%（無上限）"
       },
       {
-        "rule_id": "kumamon_japan_specified_6pct_cap500",
-        "description": "日本指定通路 6% 回饋（上限 500 TWD／期）",
+        "rule_id": "kumamon_japan_specified_bonus_6pct_cap500",
         "scope": {
           "country": "JP",
           "merchant_group": "kumamon_japan_specified"
@@ -704,7 +863,13 @@ const CARDS = [
         "cap": {
           "period": "statement_cycle",
           "max_reward_twd": 500
-        }
+        },
+        "requires": {
+          "campaign_registered": true
+        },
+        "stackable": true,
+        "priority": 2,
+        "description": "日本指定商店加碼 +6%（與日本一般 2.5% 疊加，合計最高 8.5%；每期上限 500）"
       },
       {
         "rule_id": "kumamon_paypay_3_5pct_cap100",
@@ -717,11 +882,11 @@ const CARDS = [
           "period": "quarter",
           "max_reward_twd": 100
         },
-        "description": "PayPay 3.5%（每季上限 100，優惠至 6/30）",
+        "description": "PayPay 3.5%（每季上限 100；另免 1.5% 國外交易服務費）",
         "fee_waiver": true,
         "stackable": false,
         "priority": 10,
-        "valid_until": "2026-06-30"
+        "valid_until": "2026-12-31"
       }
     ],
     "fee_waiver_by_payment": {
